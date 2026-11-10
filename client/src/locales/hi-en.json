@@ -59,7 +59,9 @@
     "room_status_completed": "Neelami Khatam Ho Chuki Hai",
     "going_once": "Pehli Baar (Going Once!)",
     "going_twice": "Doosri Baar (Going Twice!!)",
-    "fair_warning": "Aakhiri Mauka Boli Lagane Ka!"
+    "fair_warning": "Aakhiri Mauka Boli Lagane Ka!",
+    "athlete_mode": "Khiladi Mode (Player View)",
+    "spectator_mode": "Darshak Mode (Viewer Stream)"
   },
   "dashboard": {
     "title": "Player Aur Manager Dashboard",
@@ -80,7 +82,7 @@
   },
   "auth": {
     "login_title": "Arena Mein Sign In Karein",
-    "login_subtitle": "Apne role ke hisab se login karein: Darshak, Player, Team Malik, ya SuperAdmin.",
+    "login_subtitle": "Apne role ke hisab se login karein: Darshak (Viewer), Khiladi (Player), Team Malik (Owner), ya SuperAdmin.",
     "quick_demo_label": "Quick 1-Click Role Login Demo:",
     "email_or_username": "Email ya Username",
     "email_or_username_placeholder": "athlete@esports.com ya Mortal",
@@ -91,33 +93,37 @@
     "sign_in_button": "Sign In Karein",
     "signing_in": "Sign In Ho Raha Hai...",
     "new_user_prompt": "Naye user hain?",
-    "register_here": "Yahan Register Karein (Darshak, Player, Owner, Admin)",
+    "register_here": "Yahan Register Karein (Darshak, Khiladi, Team Malik, Admin)",
     "invalid_credentials": "Galat username/email ya password",
     "network_error": "Login server se jud nahi paye. Kripya dubara koshish karein.",
     "roles": {
       "darshak": {
         "title": "Darshak (Viewer)",
+        "tab_name": "Darshak",
         "badge": "Viewer Access",
         "desc": "Live neelami dekhna, khiladiyon ke stats inspect karna aur spectator mode.",
         "can_do": "Live bidding rooms real-time mein watch karein",
         "cannot_do": "Boli (bid) nahi laga sakte ya admin tools nahi milenge"
       },
       "player": {
-        "title": "Player / Khiladi",
+        "title": "Khiladi (Player)",
+        "tab_name": "Khiladi",
         "badge": "Draft Eligible",
         "desc": "Player lot status dekhna, auction pool verification aur contract track karna.",
         "can_do": "Apna profile submit karke auction pool mein enter karein",
         "cannot_do": "Dusre khiladiyon ya teams par boli nahi laga sakte"
       },
       "team_owner": {
-        "title": "Team Owner (Malik)",
+        "title": "Team Malik (Owner)",
+        "tab_name": "Team Malik",
         "badge": "Full Bidding Access",
         "desc": "Live bidding buttons active, purse budget management aur squad banana.",
         "can_do": "Live room mein bid lagayein aur team budget manage karein",
         "cannot_do": "Individually khiladi ke roop mein pool mein nahi ja sakte"
       },
       "admin": {
-        "title": "SuperAdmin",
+        "title": "SuperAdmin (Prabandhak)",
+        "tab_name": "Admin",
         "badge": "Gavel & Catalog Host",
         "desc": "Full auction gavel controls, participant KYC approvals aur sports catalog.",
         "can_do": "Hammer strike se Sold/Unsold karein aur tournaments chalayein",
@@ -125,7 +131,7 @@
       }
     },
     "register_title": "Apna Arena Account Banayein",
-    "register_subtitle": "Apna role chunein: Darshak (Viewer), Player (Khiladi), Team Malik (Owner), ya Admin. Har role ke hisab se pura platform customize ho jayega.",
+    "register_subtitle": "Apna role chunein: Darshak (Viewer), Khiladi (Player), Team Malik (Owner), ya SuperAdmin. Har role ke hisab se pura platform customize ho jayega.",
     "step1_title": "Step 1: Apna Role Chunein (Select Platform Identity)",
     "step2_title": "Step 2: Profile Details Bharein",
     "current_role": "Chuna Hua Role",

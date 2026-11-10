@@ -108,7 +108,7 @@ const Login = () => {
               }`}
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>{t('auth.roles.darshak.title', 'Darshak')}</span>
+              <span>{t('auth.roles.darshak.tab_name', 'Viewer')}</span>
             </button>
 
             <button
@@ -121,7 +121,7 @@ const Login = () => {
               }`}
             >
               <Trophy className="w-3.5 h-3.5" />
-              <span>{t('auth.roles.player.title', 'Player')}</span>
+              <span>{t('auth.roles.player.tab_name', 'Player')}</span>
             </button>
 
             <button
@@ -134,7 +134,7 @@ const Login = () => {
               }`}
             >
               <Shield className="w-3.5 h-3.5" />
-              <span>{t('auth.roles.team_owner.title', 'Team Owner')}</span>
+              <span>{t('auth.roles.team_owner.tab_name', 'Team Owner')}</span>
             </button>
 
             <button
@@ -147,7 +147,7 @@ const Login = () => {
               }`}
             >
               <Briefcase className="w-3.5 h-3.5" />
-              <span>{t('auth.roles.admin.title', 'Admin')}</span>
+              <span>{t('auth.roles.admin.tab_name', 'Admin')}</span>
             </button>
           </div>
           <p className="text-[11px] text-slate-400 text-center italic pt-1">

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Auction from '../models/Auction.js';
 import AuctionParticipant from '../models/AuctionParticipant.js';
 import Team from '../models/Team.js';
@@ -34,93 +35,91 @@ export const registerAuctionSocketHandlers = (io, socket) => {
       const serverReceivedAt = Date.now();
       const roomName = `auction:${auctionId}`;
 
-      // 1. Fetch auction state
-      const auction = await Auction.findById(auctionId);
-      if (!auction) {
-        return socket.emit(SOCKET_EVENTS.BID_REJECTED, { reason: 'Auction does not exist' });
+      const isValidAuctionId = mongoose.Types.ObjectId.isValid(auctionId);
+      let auction = null;
+      if (isValidAuctionId) {
+        auction = await Auction.findById(auctionId);
       }
 
-      if (auction.status !== AUCTION_STATUS.LIVE) {
-        return socket.emit(SOCKET_EVENTS.BID_REJECTED, {
-          reason: `Auction is currently ${auction.status}. Bids are only accepted during Live status.`,
-        });
-      }
-
-      const currentBid = auction.currentLot?.currentBid || auction.startingBid;
-      const minIncrement = auction.minimumIncrement || 250;
-
-      // 2. Validate Bid Amount against current bid
-      if (amount <= currentBid) {
-        return socket.emit(SOCKET_EVENTS.BID_REJECTED, {
-          reason: `Bid ₹${amount} must be higher than current bid of ₹${currentBid}`,
-        });
-      }
-
-      // 3. Validate Minimum Increment
-      if (amount < currentBid + minIncrement) {
-        return socket.emit(SOCKET_EVENTS.BID_REJECTED, {
-          reason: `Bid must be at least ₹${currentBid + minIncrement} (Min Increment: +₹${minIncrement})`,
-        });
-      }
-
-      // 4. Validate Team Purse Budget if teamId is provided
-      if (teamId) {
-        const team = await Team.findById(teamId);
-        if (team && team.remainingBudget < amount) {
+      // If auction exists in DB, perform strict DB validation and atomic update
+      if (auction) {
+        if (auction.status !== AUCTION_STATUS.LIVE) {
           return socket.emit(SOCKET_EVENTS.BID_REJECTED, {
-            reason: `Insufficient clan purse. Remaining budget is ₹${team.remainingBudget}, but bid was ₹${amount}`,
+            reason: `Auction is currently ${auction.status}. Bids are only accepted during Live status.`,
           });
+        }
+
+        const currentBid = auction.currentLot?.currentBid || auction.startingBid;
+        const minIncrement = auction.minimumIncrement || 250;
+
+        if (amount <= currentBid) {
+          return socket.emit(SOCKET_EVENTS.BID_REJECTED, {
+            reason: `Bid ₹${amount} must be higher than current bid of ₹${currentBid}`,
+          });
+        }
+
+        if (amount < currentBid + minIncrement) {
+          return socket.emit(SOCKET_EVENTS.BID_REJECTED, {
+            reason: `Bid must be at least ₹${currentBid + minIncrement} (Min Increment: +₹${minIncrement})`,
+          });
+        }
+
+        const isValidTeamId = teamId && mongoose.Types.ObjectId.isValid(teamId);
+        if (isValidTeamId) {
+          const team = await Team.findById(teamId);
+          if (team && team.remainingBudget < amount) {
+            return socket.emit(SOCKET_EVENTS.BID_REJECTED, {
+              reason: `Insufficient clan purse. Remaining budget is ₹${team.remainingBudget}, but bid was ₹${amount}`,
+            });
+          }
+        }
+
+        const updatedAuction = await Auction.findOneAndUpdate(
+          {
+            _id: auction._id,
+            status: AUCTION_STATUS.LIVE,
+            'currentLot.currentBid': { $lte: amount - minIncrement },
+          },
+          {
+            $set: {
+              'currentLot.currentBid': amount,
+              'currentLot.currentBidderTeam': isValidTeamId ? teamId : null,
+              'currentLot.lotEndsAt': new Date(Date.now() + 25000),
+              'currentLot.lotStatus': LOT_STATUS.BIDDING,
+            },
+          },
+          { new: true }
+        );
+
+        if (!updatedAuction) {
+          return socket.emit(SOCKET_EVENTS.BID_REJECTED, {
+            reason: 'Outbid! Another clan placed a higher bid milliseconds before you.',
+          });
+        }
+
+        if (lotId && mongoose.Types.ObjectId.isValid(lotId)) {
+          await Bid.create({
+            auction: auction._id,
+            participant: lotId,
+            team: isValidTeamId ? teamId : null,
+            bidder: socket.handshake.auth?.userId || null,
+            amount,
+            bidType: 'quick_bid',
+            serverReceivedAt,
+          }).catch((e) => console.warn('Bid logging warn:', e.message));
         }
       }
 
-      // 5. Concurrency Resolution: Atomic Pre-conditioned update
-      const updatedAuction = await Auction.findOneAndUpdate(
-        {
-          _id: auctionId,
-          status: AUCTION_STATUS.LIVE,
-          'currentLot.currentBid': { $lte: amount - minIncrement },
-        },
-        {
-          $set: {
-            'currentLot.currentBid': amount,
-            'currentLot.currentBidderTeam': teamId || null,
-            'currentLot.lotEndsAt': new Date(Date.now() + 25000), // Reset clock to 25s
-            'currentLot.lotStatus': LOT_STATUS.BIDDING,
-          },
-        },
-        { new: true }
-      );
-
-      // If condition failed, someone outbid in the exact millisecond
-      if (!updatedAuction) {
-        return socket.emit(SOCKET_EVENTS.BID_REJECTED, {
-          reason: 'Outbid! Another clan placed a higher bid milliseconds before you.',
-        });
-      }
-
-      // 6. Record immutable bid audit log
-      if (lotId) {
-        await Bid.create({
-          auction: auctionId,
-          participant: lotId,
-          team: teamId,
-          bidder: socket.handshake.auth?.userId || null,
-          amount,
-          bidType: 'quick_bid',
-          serverReceivedAt,
-        }).catch((e) => console.warn('Bid logging warn:', e.message));
-      }
-
-      // 7. Broadcast new valid bid to everyone in the room
+      // Broadcast new valid bid to everyone in the room (works for both DB and demo lots)
       io.to(roomName).emit(SOCKET_EVENTS.NEW_BID, {
         amount,
         teamName: teamName || 'Challenger Clan',
         teamTag: teamTag || 'CHLG',
-        newLotEndsAt: updatedAuction.currentLot.lotEndsAt,
+        newLotEndsAt: new Date(Date.now() + 25000),
         timestamp: new Date().toLocaleTimeString(),
       });
 
-      console.log(`⚡ Bid Accepted: ₹${amount} in ${roomName} by ${teamName}`);
+      console.log(`⚡ Bid Accepted: ₹${amount} in ${roomName} by ${teamName || 'Clan'}`);
     } catch (err) {
       console.error('Bid Processing Error:', err);
       socket.emit(SOCKET_EVENTS.BID_REJECTED, { reason: 'Internal server error processing bid' });
@@ -132,19 +131,19 @@ export const registerAuctionSocketHandlers = (io, socket) => {
     try {
       const roomName = `auction:${auctionId}`;
 
-      // Deduct budget from team
-      if (teamId && finalPrice) {
+      // Deduct budget from team if teamId is valid ObjectId
+      if (teamId && mongoose.Types.ObjectId.isValid(teamId) && finalPrice) {
         await Team.findByIdAndUpdate(teamId, {
           $inc: { remainingBudget: -finalPrice },
-        });
+        }).catch(() => {});
       }
 
-      if (lotId) {
+      if (lotId && mongoose.Types.ObjectId.isValid(lotId)) {
         await AuctionParticipant.findByIdAndUpdate(lotId, {
           status: PARTICIPANT_STATUS.SOLD,
           soldPrice: finalPrice,
           soldToTeam: teamId,
-        });
+        }).catch(() => {});
       }
 
       io.to(roomName).emit(SOCKET_EVENTS.LOT_SOLD, {
@@ -159,4 +158,3 @@ export const registerAuctionSocketHandlers = (io, socket) => {
     }
   });
 };
-

@@ -93,9 +93,9 @@ const UserDashboard = () => {
                 }`}
               >
                 {role === 'user'
-                  ? `👁️ ${t('auth.roles.darshak.title', 'Darshak (Viewer)')}`
+                  ? `👁️ ${t('auth.roles.darshak.title', 'Viewer (Spectator)')}`
                   : role === 'gamer'
-                  ? `🏃 ${t('auth.roles.player.title', 'Player / Khiladi')}`
+                  ? `🏃 ${t('auth.roles.player.title', 'Player (Athlete)')}`
                   : role === 'team_owner'
                   ? `🛡️ ${t('auth.roles.team_owner.title', 'Team Owner')}`
                   : `👑 ${t('auth.roles.admin.title', 'SuperAdmin')}`}

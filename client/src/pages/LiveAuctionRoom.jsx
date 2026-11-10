@@ -699,7 +699,7 @@ const LiveAuctionRoom = () => {
                   <div className="p-4 bg-brand-cyan/10 border border-brand-cyan/30 rounded-2xl text-left space-y-2">
                     <div className="flex items-center gap-2 text-brand-cyan font-bold text-xs uppercase tracking-wider">
                       <Trophy className="w-4 h-4" />
-                      <span>Athlete Mode (Khiladi View)</span>
+                      <span>{t('auction.athlete_mode', 'Athlete Mode (Player View)')}</span>
                     </div>
                     <p className="text-xs text-slate-300 leading-relaxed">
                       Aap Player profile se logged in hain. Franchises live room mein aapki boli laga rahi hain. Boli lagane ka adhikar keval verified Team Owners ke paas hota hai.
@@ -717,7 +717,7 @@ const LiveAuctionRoom = () => {
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-1.5 text-slate-200 font-bold text-xs uppercase tracking-wider">
                         <Eye className="w-4 h-4 text-brand-emerald" />
-                        <span>Darshak Mode (Spectator Stream)</span>
+                        <span>{t('auction.spectator_mode', 'Spectator Mode (Viewer Stream)')}</span>
                       </span>
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-emerald/15 text-brand-emerald font-bold">
                         LIVE SPECTATING

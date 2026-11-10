@@ -59,7 +59,9 @@
     "room_status_completed": "Auction Completed",
     "going_once": "Going Once!",
     "going_twice": "Going Twice!!",
-    "fair_warning": "Last Chance to Bid!"
+    "fair_warning": "Last Chance to Bid!",
+    "athlete_mode": "Athlete Mode (Player View)",
+    "spectator_mode": "Spectator Mode (Viewer Stream)"
   },
   "dashboard": {
     "title": "Player & Manager Dashboard",
@@ -80,7 +82,7 @@
   },
   "auth": {
     "login_title": "Sign In to Arena",
-    "login_subtitle": "Login based on your role: Darshak, Player, Team Owner, or SuperAdmin.",
+    "login_subtitle": "Login based on your role: Viewer, Player, Team Owner, or SuperAdmin.",
     "quick_demo_label": "Quick 1-Click Role Login Demo:",
     "email_or_username": "Email or Username",
     "email_or_username_placeholder": "athlete@esports.com or Mortal",
@@ -91,26 +93,29 @@
     "sign_in_button": "Sign In",
     "signing_in": "Signing In...",
     "new_user_prompt": "New to Arena?",
-    "register_here": "Register Here (Darshak, Player, Owner, Admin)",
+    "register_here": "Register Here (Viewer, Player, Team Owner, Admin)",
     "invalid_credentials": "Invalid username/email or password",
     "network_error": "Unable to connect to login server. Please try again.",
     "roles": {
       "darshak": {
-        "title": "Darshak (Viewer)",
+        "title": "Viewer (Spectator)",
+        "tab_name": "Viewer",
         "badge": "Viewer Access",
         "desc": "Watch live auctions, inspect player lot stats, spectator mode.",
         "can_do": "Watch live bidding rooms in real-time",
         "cannot_do": "Cannot place bids or access admin tools"
       },
       "player": {
-        "title": "Player / Khiladi",
+        "title": "Player (Athlete)",
+        "tab_name": "Player",
         "badge": "Draft Eligible",
         "desc": "Player lot status, auction pool verification & contract tracking.",
         "can_do": "Submit player profile & enter auction pool",
         "cannot_do": "Cannot bid on other players or clans"
       },
       "team_owner": {
-        "title": "Team Owner (Malik)",
+        "title": "Team Owner",
+        "tab_name": "Team Owner",
         "badge": "Full Bidding Access",
         "desc": "Full live bidding buttons active, purse management & squad drafting.",
         "can_do": "Place live bids & manage clan purse budget",
@@ -118,6 +123,7 @@
       },
       "admin": {
         "title": "SuperAdmin",
+        "tab_name": "Admin",
         "badge": "Gavel & Catalog Host",
         "desc": "Full gavel hammer controls, participant KYC approvals & sports catalog.",
         "can_do": "Hammer strike Sold/Unsold & manage tournaments",
@@ -125,7 +131,7 @@
       }
     },
     "register_title": "Create Your Arena Account",
-    "register_subtitle": "Select your role: Darshak (Viewer), Player (Khiladi), Team Malik (Owner), or Admin. The entire platform customizes to your identity.",
+    "register_subtitle": "Select your role: Viewer (Spectator), Player (Athlete), Team Owner, or SuperAdmin. The entire platform customizes to your identity.",
     "step1_title": "Step 1: Choose Your Platform Role (Identity)",
     "step2_title": "Step 2: Profile Details",
     "current_role": "Active Role",
