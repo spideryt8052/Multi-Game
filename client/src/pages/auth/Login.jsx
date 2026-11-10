@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../context/LanguageContext';
 import Button from '../../components/common/Button';
-import { Mail, Lock, AlertCircle, Sparkles, Eye, Trophy, Shield, Briefcase } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Eye, Trophy, Shield, Briefcase } from 'lucide-react';
 
 const Login = () => {
   const { login } = useAuth();
@@ -19,31 +19,27 @@ const Login = () => {
   // Quick Demo Credentials for all 4 roles
   const demoAccounts = {
     darshak: {
-      title: 'Darshak (Viewer)',
+      key: 'darshak',
       email: 'viewer@arena.gg',
       pass: 'Viewer@123',
-      desc: 'View live auctions, inspect player lot stats, spectator mode.',
       redirect: '/dashboard',
     },
     player: {
-      title: 'Player / Khiladi',
+      key: 'player',
       email: 'rohit@cricket.in',
       pass: 'Gamer@123',
-      desc: 'Player lot status, auction pool verification & contract tracking.',
       redirect: '/dashboard',
     },
     team_owner: {
-      title: 'Team Owner (Malik)',
+      key: 'team_owner',
       email: 'owner@mumbaititans.com',
       pass: 'Owner@123',
-      desc: 'Full live bidding buttons active, purse management & squad drafting.',
       redirect: '/teams',
     },
     admin: {
-      title: 'SuperAdmin',
+      key: 'admin',
       email: 'admin@arenaauctions.gg',
       pass: 'Admin@123',
-      desc: 'Full gavel hammer controls, participant KYC approvals & sports catalog.',
       redirect: '/admin',
     },
   };
@@ -72,10 +68,10 @@ const Login = () => {
           navigate('/dashboard');
         }
       } else {
-        setErrorMessage(result.message || 'Invalid username/email or password');
+        setErrorMessage(result.message || t('auth.invalid_credentials'));
       }
     } catch (err) {
-      setErrorMessage(err.response?.data?.message || 'Unable to connect to login server. Please try again.');
+      setErrorMessage(err.response?.data?.message || t('auth.network_error'));
     } finally {
       setLoading(false);
     }
@@ -89,17 +85,17 @@ const Login = () => {
             ⚡
           </div>
           <h2 className="font-gaming text-3xl font-extrabold text-slate-100 uppercase">
-            Sign In to Arena
+            {t('auth.login_title', 'Sign In to Arena')}
           </h2>
           <p className="text-xs text-slate-400">
-            Login based on your role: Darshak, Player, Team Owner, or SuperAdmin.
+            {t('auth.login_subtitle', 'Login based on your role: Darshak, Player, Team Owner, or SuperAdmin.')}
           </p>
         </div>
 
         {/* 4 Role Selector Tabs */}
         <div className="space-y-1.5">
           <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider text-center">
-            Quick 1-Click Role Login Demo:
+            {t('auth.quick_demo_label', 'Quick 1-Click Role Login Demo:')}
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-dark-surface rounded-xl border border-dark-border">
             <button
@@ -112,7 +108,7 @@ const Login = () => {
               }`}
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>Darshak</span>
+              <span>{t('auth.roles.darshak.title', 'Darshak')}</span>
             </button>
 
             <button
@@ -125,7 +121,7 @@ const Login = () => {
               }`}
             >
               <Trophy className="w-3.5 h-3.5" />
-              <span>Player</span>
+              <span>{t('auth.roles.player.title', 'Player')}</span>
             </button>
 
             <button
@@ -138,7 +134,7 @@ const Login = () => {
               }`}
             >
               <Shield className="w-3.5 h-3.5" />
-              <span>Team Owner</span>
+              <span>{t('auth.roles.team_owner.title', 'Team Owner')}</span>
             </button>
 
             <button
@@ -151,11 +147,11 @@ const Login = () => {
               }`}
             >
               <Briefcase className="w-3.5 h-3.5" />
-              <span>Admin</span>
+              <span>{t('auth.roles.admin.title', 'Admin')}</span>
             </button>
           </div>
           <p className="text-[11px] text-slate-400 text-center italic pt-1">
-            {demoAccounts[activeRoleTab].desc}
+            {t(`auth.roles.${activeRoleTab}.desc`)}
           </p>
         </div>
 
@@ -169,7 +165,7 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Email or Username
+              {t('auth.email_or_username', 'Email or Username')}
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -178,7 +174,7 @@ const Login = () => {
                 required
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="athlete@esports.com or Mortal"
+                placeholder={t('auth.email_or_username_placeholder', 'athlete@esports.com or Mortal')}
                 className="w-full pl-9 pr-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-emerald"
               />
             </div>
@@ -186,9 +182,11 @@ const Login = () => {
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-slate-300">Password</label>
+              <label className="text-xs font-semibold text-slate-300">
+                {t('auth.password', 'Password')}
+              </label>
               <Link to="/forgot-password" className="text-[11px] text-brand-emerald hover:underline">
-                Forgot password?
+                {t('auth.forgot_password', 'Forgot password?')}
               </Link>
             </div>
             <div className="relative">
@@ -198,21 +196,21 @@ const Login = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
+                placeholder={t('auth.password_placeholder', '••••••••••••')}
                 className="w-full pl-9 pr-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-emerald"
               />
             </div>
           </div>
 
           <Button type="submit" variant="primary" size="md" loading={loading} className="w-full mt-2">
-            Sign In as {demoAccounts[activeRoleTab].title}
+            {loading ? t('auth.signing_in', 'Signing In...') : `${t('auth.sign_in_as', 'Sign In as')} ${t(`auth.roles.${activeRoleTab}.title`)}`}
           </Button>
         </form>
 
         <div className="text-center pt-2 text-xs text-slate-400">
-          <span>Naye user hain? </span>
+          <span>{t('auth.new_user_prompt', 'New to Arena?')} </span>
           <Link to="/register" className="text-brand-emerald font-semibold hover:underline">
-            Register Here (Darshak, Player, Owner, Admin)
+            {t('auth.register_here', 'Register Here (Darshak, Player, Owner, Admin)')}
           </Link>
         </div>
       </div>

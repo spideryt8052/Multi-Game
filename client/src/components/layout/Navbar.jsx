@@ -127,12 +127,12 @@ const Navbar = () => {
                     </span>
                     <span className="text-[10px] text-brand-emerald uppercase font-bold tracking-wider">
                       {user?.role === 'user'
-                        ? '👁️ Darshak'
+                        ? `👁️ ${t('auth.roles.darshak.title', 'Darshak')}`
                         : user?.role === 'gamer'
-                        ? '🏃 Player'
+                        ? `🏃 ${t('auth.roles.player.title', 'Player')}`
                         : user?.role === 'team_owner'
-                        ? '🛡️ Team Owner'
-                        : '👑 Admin'}
+                        ? `🛡️ ${t('auth.roles.team_owner.title', 'Team Owner')}`
+                        : `👑 ${t('auth.roles.admin.title', 'Admin')}`}
                     </span>
                   </div>
                 </button>

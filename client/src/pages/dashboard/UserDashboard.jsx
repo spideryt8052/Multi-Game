@@ -93,12 +93,12 @@ const UserDashboard = () => {
                 }`}
               >
                 {role === 'user'
-                  ? '👁️ Darshak (Viewer)'
+                  ? `👁️ ${t('auth.roles.darshak.title', 'Darshak (Viewer)')}`
                   : role === 'gamer'
-                  ? '🏃 Player / Khiladi'
+                  ? `🏃 ${t('auth.roles.player.title', 'Player / Khiladi')}`
                   : role === 'team_owner'
-                  ? '🛡️ Team Owner'
-                  : '👑 SuperAdmin'}
+                  ? `🛡️ ${t('auth.roles.team_owner.title', 'Team Owner')}`
+                  : `👑 ${t('auth.roles.admin.title', 'SuperAdmin')}`}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-1">

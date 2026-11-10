@@ -25,8 +25,8 @@ const Register = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  // 4 Core Platform Roles
-  const [selectedRole, setSelectedRole] = useState('user'); // 'user' (Darshak), 'gamer' (Player), 'team_owner' (Team Malik), 'admin'
+  // 4 Core Platform Roles: 'user' (Darshak), 'gamer' (Player), 'team_owner' (Team Malik), 'admin'
+  const [selectedRole, setSelectedRole] = useState('user');
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -60,57 +60,32 @@ const Register = () => {
   const rolesConfig = [
     {
       id: 'user',
-      title: 'Darshak (Spectator / Fan)',
-      badge: 'Viewer Access',
+      roleKey: 'darshak',
       icon: Eye,
-      description: 'Live auction dekhna, bids follow karna aur matches spectate karna.',
-      canDo: ['Live bidding rooms watch karna', 'Player stats & leaderboards dekhna', 'Tournaments follow karna'],
-      cannotDo: ['Boli (Bid) nahi laga sakte', 'Admin controls nahi milenge'],
     },
     {
       id: 'gamer',
-      title: 'Player / Khiladi (Athlete)',
-      badge: 'Draft Eligible',
+      roleKey: 'player',
       icon: Trophy,
-      description: 'Auction pool mein enter hona aur teams dwara kharida jana.',
-      canDo: ['Apna player profile & stats submit karna', 'Auction lot queue mein ana', 'Franchise contract sign karna'],
-      cannotDo: ['Dusre players par boli nahi laga sakte', 'Admin controls nahi milenge'],
     },
     {
       id: 'team_owner',
-      title: 'Team Owner (Team Malik)',
-      badge: 'Full Bidding Access',
+      roleKey: 'team_owner',
       icon: Shield,
-      description: 'Apni team banana, purse budget manage karna aur players par live boli lagana.',
-      canDo: ['Live auction room mein bid lagana', 'Apni franchise ka budget purse manage karna', 'Winning squad create karna'],
-      cannotDo: ['Khiladi ke roop mein pool mein nahi ja sakte', 'Admin controls nahi milenge'],
     },
     {
       id: 'admin',
-      title: 'Admin (Prabandhak)',
-      badge: 'Root SuperAdmin',
+      roleKey: 'admin',
       icon: Briefcase,
-      description: 'Poore platform aur tournaments ka full management aur control.',
-      canDo: ['Auctions start/pause/sold gavel strike karna', 'Players approve/reject karna', 'Sports & rules add karna'],
-      cannotDo: ['Spectator jaisa normal view nahi'],
     },
   ];
+
+  const currentRoleConfig = rolesConfig.find((r) => r.id === selectedRole) || rolesConfig[0];
+  const currentRoleTitle = t(`auth.roles.${currentRoleConfig.roleKey}.title`);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleGameToggle = (gameTitle) => {
-    setFormData((prev) => {
-      const exists = prev.favoriteGames.includes(gameTitle);
-      return {
-        ...prev,
-        favoriteGames: exists
-          ? prev.favoriteGames.filter((g) => g !== gameTitle)
-          : [...prev.favoriteGames, gameTitle],
-      };
-    });
   };
 
   const handleSubmit = async (e) => {
@@ -118,17 +93,19 @@ const Register = () => {
     setErrorMessage('');
 
     if (formData.password !== formData.confirmPassword) {
-      setErrorMessage('Passwords match nahi ho rahe hain');
+      setErrorMessage(t('auth.passwords_mismatch', 'Passwords do not match'));
       return;
     }
 
     if (formData.password.length < 6) {
-      setErrorMessage('Password kam se kam 6 characters ka hona chahiye');
+      setErrorMessage(t('auth.password_too_short', 'Password must be at least 6 characters'));
       return;
     }
 
     if (selectedRole === 'admin' && formData.adminPasskey !== 'ARENA2026') {
-      setErrorMessage('Galat Admin Passkey! SuperAdmin registration ke liye secret key required hai.');
+      setErrorMessage(
+        t('auth.invalid_admin_passkey', 'Invalid Admin Passkey! SuperAdmin registration requires the secret key.')
+      );
       return;
     }
 
@@ -161,7 +138,7 @@ const Register = () => {
         setErrorMessage(result.message || 'Registration failed');
       }
     } catch (err) {
-      setErrorMessage(err.response?.data?.message || 'Server error. Please verify your details.');
+      setErrorMessage(err.response?.data?.message || t('auth.network_error', 'Server error. Please verify your details.'));
     } finally {
       setLoading(false);
     }
@@ -176,22 +153,30 @@ const Register = () => {
             ⚡
           </div>
           <h1 className="font-gaming text-3xl sm:text-5xl font-extrabold text-slate-100 uppercase">
-            Create Your Arena Account
+            {t('auth.register_title', 'Create Your Arena Account')}
           </h1>
           <p className="text-sm text-slate-400 max-w-xl mx-auto">
-            Apna role select karein: <span className="text-slate-200 font-semibold">Darshak (Viewer)</span>, <span className="text-brand-cyan font-semibold">Player (Khiladi)</span>, <span className="text-brand-emerald font-semibold">Team Malik (Owner)</span> ya <span className="text-brand-gold font-semibold">Admin</span>. Har role ke hisab se platform customize hoga.
+            {t(
+              'auth.register_subtitle',
+              'Select your role: Darshak (Viewer), Player (Khiladi), Team Malik (Owner), or Admin. The entire platform customizes to your identity.'
+            )}
           </p>
         </div>
 
         {/* STEP 1: Select Role (4 Cards) */}
         <div className="space-y-3">
           <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider text-center">
-            Step 1: Apna Role Chunein (Select Platform Identity)
+            {t('auth.step1_title', 'Step 1: Choose Your Platform Role (Identity)')}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {rolesConfig.map((role) => {
               const Icon = role.icon;
               const isSelected = selectedRole === role.id;
+              const roleTitle = t(`auth.roles.${role.roleKey}.title`);
+              const roleBadge = t(`auth.roles.${role.roleKey}.badge`);
+              const roleDesc = t(`auth.roles.${role.roleKey}.desc`);
+              const roleCanDo = t(`auth.roles.${role.roleKey}.can_do`);
+              const roleCannotDo = t(`auth.roles.${role.roleKey}.cannot_do`);
 
               return (
                 <button
@@ -222,22 +207,22 @@ const Register = () => {
                             : 'bg-dark-surface text-slate-400 border-dark-border'
                         }`}
                       >
-                        {role.badge}
+                        {roleBadge}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="font-gaming text-lg font-bold text-slate-100">{role.title}</h3>
-                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">{role.description}</p>
+                      <h3 className="font-gaming text-lg font-bold text-slate-100">{roleTitle}</h3>
+                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">{roleDesc}</p>
                     </div>
                   </div>
 
                   <div className="pt-4 border-t border-dark-border/60 mt-3 text-[11px] space-y-1">
                     <p className="text-brand-emerald font-semibold flex items-center gap-1">
-                      <span>✓ {role.canDo[0]}</span>
+                      <span>✓ {roleCanDo}</span>
                     </p>
                     <p className="text-slate-500 flex items-center gap-1">
-                      <span>✕ {role.cannotDo[0]}</span>
+                      <span>✕ {roleCannotDo}</span>
                     </p>
                   </div>
                 </button>
@@ -251,14 +236,15 @@ const Register = () => {
           <div className="border-b border-dark-border pb-4 flex items-center justify-between">
             <div>
               <span className="text-[11px] text-brand-emerald font-bold uppercase tracking-wider block">
-                Step 2: Profile Details
+                {t('auth.step2_title', 'Step 2: Profile Details')}
               </span>
               <h2 className="font-gaming text-2xl font-bold text-slate-100 uppercase">
-                {rolesConfig.find((r) => r.id === selectedRole)?.title} Registration
+                {currentRoleTitle}
               </h2>
             </div>
             <span className="text-xs text-slate-400">
-              Role: <span className="font-bold text-brand-emerald uppercase">{selectedRole}</span>
+              {t('auth.current_role', 'Active Role')}:{' '}
+              <span className="font-bold text-brand-emerald uppercase">{currentRoleTitle}</span>
             </span>
           </div>
 
@@ -273,7 +259,9 @@ const Register = () => {
             {/* Common Details (For all 4 roles) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Full Legal Name</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  {t('auth.full_name', 'Full Legal Name')}
+                </label>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -282,21 +270,23 @@ const Register = () => {
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
-                    placeholder="e.g. Rohit Verma"
+                    placeholder={t('auth.full_name_placeholder', 'e.g. Rohit Verma')}
                     className="w-full pl-9 pr-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Username / Platform Alias</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  {t('auth.username', 'Username / Platform Alias')}
+                </label>
                 <input
                   type="text"
                   required
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
-                  placeholder="e.g. rohit_titans"
+                  placeholder={t('auth.username_placeholder', 'e.g. rohit_titans')}
                   className="w-full px-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                 />
               </div>
@@ -304,7 +294,9 @@ const Register = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  {t('auth.email', 'Email Address')}
+                </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -313,14 +305,16 @@ const Register = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="name@domain.com"
+                    placeholder={t('auth.email_placeholder', 'name@domain.com')}
                     className="w-full pl-9 pr-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Mobile Number</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  {t('auth.mobile', 'Mobile Number')}
+                </label>
                 <div className="relative">
                   <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -329,7 +323,7 @@ const Register = () => {
                     name="mobileNumber"
                     value={formData.mobileNumber}
                     onChange={handleChange}
-                    placeholder="+91 9876543210"
+                    placeholder={t('auth.mobile_placeholder', '+91 9876543210')}
                     className="w-full pl-9 pr-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
@@ -341,25 +335,33 @@ const Register = () => {
               <div className="bg-dark-surface/50 border border-brand-cyan/30 rounded-2xl p-5 space-y-4">
                 <div className="flex items-center gap-2 text-brand-cyan text-xs font-bold uppercase tracking-wider">
                   <Trophy className="w-4 h-4" />
-                  <span>Athlete / Sports Lot Verification Details</span>
+                  <span>{t('auth.athlete_section_title', 'Athlete / Sports Lot Verification Details')}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-300 mb-1">Sport / Game Category</label>
+                    <label className="block text-[11px] text-slate-300 mb-1">
+                      {t('auth.sport_category', 'Sport / Game Category')}
+                    </label>
                     <select
                       name="sportCategory"
                       value={formData.sportCategory}
                       onChange={handleChange}
                       className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                     >
-                      <option value="physical_sports">🏏 Physical Sport (Cricket, Football, etc.)</option>
-                      <option value="esports">🎮 Esports (BGMI, Valorant, etc.)</option>
+                      <option value="physical_sports">
+                        {t('auth.sport_cat_physical', '🏏 Physical Sport (Cricket, Football, etc.)')}
+                      </option>
+                      <option value="esports">
+                        {t('auth.sport_cat_esports', '🎮 Esports (BGMI, Valorant, etc.)')}
+                      </option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-300 mb-1">Primary Title</label>
+                    <label className="block text-[11px] text-slate-300 mb-1">
+                      {t('auth.primary_sport', 'Primary Title')}
+                    </label>
                     <select
                       name="primarySport"
                       value={formData.primarySport}
@@ -375,13 +377,15 @@ const Register = () => {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-300 mb-1">Playing Role / Position</label>
+                    <label className="block text-[11px] text-slate-300 mb-1">
+                      {t('auth.playing_role', 'Playing Role / Position')}
+                    </label>
                     <input
                       type="text"
                       name="primaryRole"
                       value={formData.primaryRole}
                       onChange={handleChange}
-                      placeholder="e.g. All-Rounder / Striker / IGL"
+                      placeholder={t('auth.playing_role_placeholder', 'e.g. All-Rounder / Striker / IGL')}
                       className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
@@ -389,26 +393,30 @@ const Register = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-300 mb-1">In-Game UID / Jersey Number</label>
+                    <label className="block text-[11px] text-slate-300 mb-1">
+                      {t('auth.in_game_id', 'In-Game UID / Jersey Number')}
+                    </label>
                     <input
                       type="text"
                       required
                       name="inGameId"
                       value={formData.inGameId}
                       onChange={handleChange}
-                      placeholder="e.g. Jersey #45 or BGMI UID 5129481"
+                      placeholder={t('auth.in_game_id_placeholder', 'e.g. Jersey #45 or BGMI UID 5129481')}
                       className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-300 mb-1">Career Accolades / Stats</label>
+                    <label className="block text-[11px] text-slate-300 mb-1">
+                      {t('auth.accolades', 'Career Accolades / Stats')}
+                    </label>
                     <input
                       type="text"
                       name="accolades"
                       value={formData.accolades}
                       onChange={handleChange}
-                      placeholder="e.g. Best Bowler 2024, Strike Rate: 168.4"
+                      placeholder={t('auth.accolades_placeholder', 'e.g. Best Bowler 2024, Strike Rate: 168.4')}
                       className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
@@ -421,39 +429,45 @@ const Register = () => {
               <div className="bg-dark-surface/50 border border-brand-emerald/30 rounded-2xl p-5 space-y-4">
                 <div className="flex items-center gap-2 text-brand-emerald text-xs font-bold uppercase tracking-wider">
                   <Shield className="w-4 h-4" />
-                  <span>Franchise / Clan Ownership Details</span>
+                  <span>{t('auth.team_section_title', 'Franchise / Clan Ownership Details')}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="sm:col-span-2">
-                    <label className="block text-[11px] text-slate-300 mb-1">Franchise / Team Name</label>
+                    <label className="block text-[11px] text-slate-300 mb-1">
+                      {t('auth.team_name', 'Franchise / Team Name')}
+                    </label>
                     <input
                       type="text"
                       required
                       name="teamName"
                       value={formData.teamName}
                       onChange={handleChange}
-                      placeholder="e.g. Mumbai Titans or GodLike"
+                      placeholder={t('auth.team_name_placeholder', 'e.g. Mumbai Titans or GodLike')}
                       className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-300 mb-1">Team Tag (3-4 Chars)</label>
+                    <label className="block text-[11px] text-slate-300 mb-1">
+                      {t('auth.team_tag', 'Team Tag (3-4 Chars)')}
+                    </label>
                     <input
                       type="text"
                       required
                       name="teamTag"
                       value={formData.teamTag}
                       onChange={handleChange}
-                      placeholder="MT"
+                      placeholder={t('auth.team_tag_placeholder', 'MT')}
                       className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 font-mono uppercase focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] text-slate-300 mb-1">Initial Clan Purse Budget (₹)</label>
+                  <label className="block text-[11px] text-slate-300 mb-1">
+                    {t('auth.team_budget', 'Initial Clan Purse Budget (₹)')}
+                  </label>
                   <input
                     type="number"
                     required
@@ -463,7 +477,10 @@ const Register = () => {
                     className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-brand-emerald"
                   />
                   <span className="text-[10px] text-slate-400 mt-1 block">
-                    This purse will be allocated to your franchise for live bidding in tournament rooms.
+                    {t(
+                      'auth.team_budget_help',
+                      'This purse will be allocated to your franchise for live bidding in tournament rooms.'
+                    )}
                   </span>
                 </div>
               </div>
@@ -473,7 +490,7 @@ const Register = () => {
             {selectedRole === 'admin' && (
               <div className="bg-brand-gold/10 border border-brand-gold/30 rounded-2xl p-5 space-y-2">
                 <label className="block text-xs font-bold text-brand-gold uppercase tracking-wider">
-                  SuperAdmin Authorization Passkey
+                  {t('auth.admin_section_title', 'SuperAdmin Authorization Passkey')}
                 </label>
                 <input
                   type="password"
@@ -481,11 +498,12 @@ const Register = () => {
                   name="adminPasskey"
                   value={formData.adminPasskey}
                   onChange={handleChange}
-                  placeholder="Enter Secret Key (Demo: ARENA2026)"
+                  placeholder={t('auth.admin_passkey_placeholder', 'Enter Secret Key (Demo: ARENA2026)')}
                   className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-gold"
                 />
                 <p className="text-[11px] text-slate-400">
-                  Demo Passkey for evaluator: <span className="font-mono text-brand-gold font-bold">ARENA2026</span>
+                  {t('auth.admin_passkey_help', 'Demo Passkey for evaluator:')}{' '}
+                  <span className="font-mono text-brand-gold font-bold">ARENA2026</span>
                 </p>
               </div>
             )}
@@ -493,7 +511,9 @@ const Register = () => {
             {/* Passwords */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  {t('auth.password_label', 'Password')}
+                </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -502,14 +522,16 @@ const Register = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Min 6 characters"
+                    placeholder={t('auth.password_min_help', 'Min 6 characters')}
                     className="w-full pl-9 pr-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Confirm Password</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  {t('auth.confirm_password_label', 'Confirm Password')}
+                </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -518,7 +540,7 @@ const Register = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    placeholder="Repeat password"
+                    placeholder={t('auth.confirm_password_placeholder', 'Repeat password')}
                     className="w-full pl-9 pr-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
@@ -526,14 +548,14 @@ const Register = () => {
             </div>
 
             <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full mt-4">
-              Complete {rolesConfig.find((r) => r.id === selectedRole)?.title} Registration
+              {t('auth.complete_registration', 'Complete Registration')} ({currentRoleTitle})
             </Button>
           </form>
 
           <div className="text-center pt-2 text-xs text-slate-400">
-            <span>Already have an account? </span>
+            <span>{t('auth.already_have_account', 'Already have an account?')} </span>
             <Link to="/login" className="text-brand-emerald font-semibold hover:underline">
-              Sign In Here
+              {t('auth.sign_in_here', 'Sign In Here')}
             </Link>
           </div>
         </div>
