@@ -291,3 +291,4 @@ const AuctionDetail = () => {
 };
 
 export default AuctionDetail;
+

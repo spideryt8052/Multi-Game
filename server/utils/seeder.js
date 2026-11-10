@@ -131,6 +131,26 @@ const seedData = async () => {
         description: 'High-intensity contact sports player draft: Main Raiders and Corner Defenders.',
         defaultRoles: ['Main Raider', 'Right Corner Defender', 'Left Corner Defender', 'All-Rounder'],
       },
+      {
+        title: 'Chess (Global League & Blitz)',
+        slug: 'chess',
+        categoryType: 'physical_sports',
+        developer: 'FIDE / Global Chess League',
+        genre: 'Mind & Board Sport',
+        bannerImage: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=1200&auto=format&fit=crop',
+        description: 'High-stakes chess franchise drafts: Grandmasters (Board 1), Rapid & Blitz Specialists.',
+        defaultRoles: ['Grandmaster (Board 1)', 'International Master (Board 2)', 'Rapid / Blitz Specialist', 'Junior Prodigy'],
+      },
+      {
+        title: 'Carrom (National Championship)',
+        slug: 'carrom',
+        categoryType: 'physical_sports',
+        developer: 'All India Carrom Federation',
+        genre: 'Tabletop Sport',
+        bannerImage: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?q=80&w=1200&auto=format&fit=crop',
+        description: 'National carrom championship drafts: White Slam masters, Direct Strikers, and Cut & Pocket specialists.',
+        defaultRoles: ['White Slam Specialist', 'Direct Striker', 'Cut & Pocket Master', 'Doubles Partner'],
+      },
     ]);
 
     const cricketGame = games.find((g) => g.slug === 'cricket');

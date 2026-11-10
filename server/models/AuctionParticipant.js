@@ -47,6 +47,10 @@ const auctionParticipantSchema = new mongoose.Schema(
       assists: { type: Number, default: 0 },
       raidPoints: { type: Number, default: 0 },
       tacklePoints: { type: Number, default: 0 },
+      // Chess & Carrom statistics
+      fideRating: { type: Number, default: 0 },
+      blitzRating: { type: Number, default: 0 },
+      whiteSlams: { type: Number, default: 0 },
       jerseyNumber: { type: Number },
     },
     photo: {

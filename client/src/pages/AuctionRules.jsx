@@ -52,6 +52,35 @@ const AuctionRules = () => {
       ],
       hammerClock: '30 seconds contact sport bidding clock.',
     },
+    chess: {
+      category: 'physical_sports',
+      title: 'Global Chess League & Grandmaster Draft Regulations',
+      squadFormat: '6 Boards: Board 1 Icon, 2 Men Superstars, 2 Women Masters, 1 U-21 Prodigy',
+      budgetLimit: '₹80,000 Total Franchise Purse',
+      basePrice: '₹8,000 - ₹15,000 Base Player Price',
+      increments: 'Minimum ₹500 increment',
+      roleConstraints: [
+        'Board 1 Icon: Mandatory Super Grandmaster (FIDE Classical Rating > 2650).',
+        'Women Master Quota: At least 2 verified WGM/IM players per franchise.',
+        'Junior Prodigy: 1 mandatory slot reserved for Under-21 ranked master.',
+        'Tie-break Armageddon capability required for team roster registration.',
+      ],
+      hammerClock: '30 seconds per lot with FIDE rating verification.',
+    },
+    carrom: {
+      category: 'physical_sports',
+      title: 'All-India Carrom Championship Draft Regulations',
+      squadFormat: '4 Active Board Players + 1 Substitute (Squad of 5)',
+      budgetLimit: '₹50,000 Club Purse Cap',
+      basePrice: '₹3,000 Base Player Price',
+      increments: 'Minimum ₹250 increment',
+      roleConstraints: [
+        'White Slam Specialist: Each team must have at least 1 verified White Slam master.',
+        'Direct Striker & Cut-and-Pocket specialist quota.',
+        'Doubles partner chemistry verified before state license registration.',
+      ],
+      hammerClock: '25 seconds rapid tabletop draft timer.',
+    },
 
     // Esports
     bgmi: {

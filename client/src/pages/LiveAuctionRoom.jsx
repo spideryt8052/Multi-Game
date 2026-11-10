@@ -28,6 +28,7 @@ import {
   Gavel,
   Sparkles,
   Bot,
+  Activity,
 } from 'lucide-react';
 
 const LiveAuctionRoom = () => {
@@ -47,23 +48,48 @@ const LiveAuctionRoom = () => {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [bidError, setBidError] = useState('');
   const [customBidInput, setCustomBidInput] = useState('');
-  const [lotResult, setLotResult] = useState(null); // { type: 'sold' | 'unsold', details }
+  const [lotResult, setLotResult] = useState(null);
   const [simulatedRivalsActive, setSimulatedRivalsActive] = useState(false);
 
-  // Team wallet for logged-in user
-  const [myTeam, setMyTeam] = useState({
-    _id: 'team_godl',
-    name: 'GodLike Esports',
-    tag: 'GODL',
-    remainingBudget: 38500,
+  // Is this a physical sport or esports lot?
+  const isPhysicalSport =
+    auction.categoryType === 'physical_sports' ||
+    auction.gameSlug === 'cricket' ||
+    auction.gameSlug === 'football' ||
+    auction.gameSlug === 'kabaddi';
+
+  // Team wallet
+  const [myTeam, setMyTeam] = useState(() => {
+    if (auction.gameSlug === 'cricket') {
+      return {
+        _id: 'team_mumbai_titans',
+        name: 'Mumbai Titans',
+        tag: 'MT',
+        remainingBudget: 67500,
+      };
+    }
+    return {
+      _id: 'team_godl',
+      name: 'GodLike Esports',
+      tag: 'GODL',
+      remainingBudget: 38500,
+    };
   });
 
-  const [participatingTeams, setParticipatingTeams] = useState([
-    { id: 't1', name: 'GodLike Esports', tag: 'GODL', budget: 38500, isMe: true },
-    { id: 't2', name: 'Team Soul', tag: 'SOUL', budget: 42000, isMe: false },
-    { id: 't3', name: 'Blind Esports', tag: 'BLIND', budget: 29500, isMe: false },
-    { id: 't4', name: 'Global Esports', tag: 'GE', budget: 35000, isMe: false },
-  ]);
+  const participatingTeams =
+    auction.gameSlug === 'cricket'
+      ? [
+          { id: 't1', name: 'Mumbai Titans', tag: 'MT', budget: 67500, isMe: true },
+          { id: 't2', name: 'Bandra Blasters', tag: 'BB', budget: 74000, isMe: false },
+          { id: 't3', name: 'Andheri Warriors', tag: 'AW', budget: 80000, isMe: false },
+          { id: 't4', name: 'Pune Smashers', tag: 'PS', budget: 52000, isMe: false },
+        ]
+      : [
+          { id: 't1', name: 'GodLike Esports', tag: 'GODL', budget: 38500, isMe: true },
+          { id: 't2', name: 'Team Soul', tag: 'SOUL', budget: 42000, isMe: false },
+          { id: 't3', name: 'Blind Esports', tag: 'BLIND', budget: 29500, isMe: false },
+          { id: 't4', name: 'Global Esports', tag: 'GE', budget: 35000, isMe: false },
+        ];
 
   // Socket setup & event listeners
   useEffect(() => {
@@ -128,15 +154,9 @@ const LiveAuctionRoom = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          return 0;
-        }
-        if (prev <= 5 && soundEnabled) {
-          playTickSound();
-        }
-        if (prev === 10 && soundEnabled) {
-          playWarningSound();
-        }
+        if (prev <= 1) return 0;
+        if (prev <= 5 && soundEnabled) playTickSound();
+        if (prev === 10 && soundEnabled) playWarningSound();
         return prev - 1;
       });
     }, 1000);
@@ -148,11 +168,18 @@ const LiveAuctionRoom = () => {
   useEffect(() => {
     if (!simulatedRivalsActive || secondsLeft <= 3 || lotResult) return;
 
-    const rivalClans = [
-      { name: 'Team Soul', tag: 'SOUL' },
-      { name: 'Blind Esports', tag: 'BLIND' },
-      { name: 'Global Esports', tag: 'GE' },
-    ];
+    const rivalClans =
+      auction.gameSlug === 'cricket'
+        ? [
+            { name: 'Bandra Blasters', tag: 'BB' },
+            { name: 'Andheri Warriors', tag: 'AW' },
+            { name: 'Pune Smashers', tag: 'PS' },
+          ]
+        : [
+            { name: 'Team Soul', tag: 'SOUL' },
+            { name: 'Blind Esports', tag: 'BLIND' },
+            { name: 'Global Esports', tag: 'GE' },
+          ];
 
     const interval = setInterval(() => {
       const currentHighest = currentLot?.currentBid || auction.startingBid;
@@ -160,7 +187,7 @@ const LiveAuctionRoom = () => {
       const rival = rivalClans[Math.floor(Math.random() * rivalClans.length)];
       const newAmount = currentHighest + increment;
 
-      if (currentLot?.currentBidderTeam?.name !== rival.name && newAmount < 50000) {
+      if (currentLot?.currentBidderTeam?.name !== rival.name && newAmount < 150000) {
         if (soundEnabled) playBidSound();
 
         setCurrentLot((prev) => ({
@@ -189,7 +216,7 @@ const LiveAuctionRoom = () => {
   const handleLotSoldEffect = (soldData) => {
     setLotResult({
       type: 'sold',
-      teamName: soldData?.teamName || currentLot?.currentBidderTeam?.name || 'Winning Clan',
+      teamName: soldData?.teamName || currentLot?.currentBidderTeam?.name || 'Winning Franchise',
       amount: soldData?.finalPrice || currentLot?.currentBid,
       athleteName: currentLot?.participant?.inGameName,
     });
@@ -227,7 +254,7 @@ const LiveAuctionRoom = () => {
     }
 
     if (amount > myTeam.remainingBudget) {
-      setBidError(`Bid amount exceeds your clan purse of ${formatCurrency(myTeam.remainingBudget)}`);
+      setBidError(`Bid amount exceeds your franchise purse of ${formatCurrency(myTeam.remainingBudget)}`);
       return;
     }
 
@@ -293,23 +320,47 @@ const LiveAuctionRoom = () => {
   const handleResetNextLot = () => {
     setLotResult(null);
     setSecondsLeft(30);
-    setCurrentLot({
-      participant: {
-        _id: 'part_bgmi_02',
-        inGameName: 'GodL_Jonathan',
-        inGameId: '511223344',
-        primaryRole: 'Assaulter / Finisher',
-        basePrice: 6000,
-        kdRatio: 5.64,
-        winRate: 42.1,
-        tierRank: 'Conqueror Top 10',
-        esportsTrophies: ['PMIS MVP', 'BGIS Champion'],
-        photo: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400&auto=format&fit=crop',
-      },
-      currentBid: 6000,
-      currentBidderTeam: null,
-      lotStatus: 'bidding',
-    });
+
+    if (auction.gameSlug === 'cricket') {
+      setCurrentLot({
+        participant: {
+          _id: 'part_cric_02',
+          inGameName: 'Jasprit_Bumrah (Pace Specialist)',
+          inGameId: 'Jersey #93',
+          primaryRole: 'Fast Bowler (Right-Arm Fast / Yorker Master)',
+          basePrice: 15000,
+          wickets: 68,
+          bowlingEconomy: 5.4,
+          strikeRate: 14.2,
+          runsScored: 180,
+          matchesPlayed: 48,
+          tierRank: 'National Tier 1',
+          esportsTrophies: ['Purple Cap Winner', 'Death Overs Specialist'],
+          photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop',
+        },
+        currentBid: 15000,
+        currentBidderTeam: null,
+        lotStatus: 'bidding',
+      });
+    } else {
+      setCurrentLot({
+        participant: {
+          _id: 'part_bgmi_02',
+          inGameName: 'GodL_Jonathan',
+          inGameId: '511223344',
+          primaryRole: 'Assaulter / Finisher',
+          basePrice: 6000,
+          kdRatio: 5.64,
+          winRate: 42.1,
+          tierRank: 'Conqueror Top 10',
+          esportsTrophies: ['PMIS MVP', 'BGIS Champion'],
+          photo: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400&auto=format&fit=crop',
+        },
+        currentBid: 6000,
+        currentBidderTeam: null,
+        lotStatus: 'bidding',
+      });
+    }
   };
 
   return (
@@ -351,7 +402,7 @@ const LiveAuctionRoom = () => {
                 ? 'bg-brand-purple/20 text-brand-purple border-brand-purple/50'
                 : 'bg-dark-surface border-dark-border text-slate-400 hover:text-slate-200'
             }`}
-            title="Toggle automated rival clan bidding for demonstration"
+            title="Toggle automated rival franchise bidding for demonstration"
           >
             <Bot className="w-3.5 h-3.5" />
             <span>Rival Bots: {simulatedRivalsActive ? 'ON' : 'OFF'}</span>
@@ -369,7 +420,7 @@ const LiveAuctionRoom = () => {
           </button>
 
           <div className="px-3.5 py-1.5 rounded-xl bg-dark-surface border border-brand-emerald/30 text-right">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">My Clan Purse</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">My Franchise Purse</span>
             <span className="font-mono text-sm font-bold text-brand-emerald">
               {formatCurrency(myTeam.remainingBudget)}
             </span>
@@ -386,13 +437,15 @@ const LiveAuctionRoom = () => {
               <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-crimson/15 text-brand-crimson border border-brand-crimson/30">
                 ACTIVE LOT
               </span>
-              <span className="text-xs text-slate-400 font-semibold">{auction.gameName}</span>
+              <span className="text-xs text-brand-emerald font-bold uppercase">
+                {isPhysicalSport ? '🏏 Physical Sport' : '🎮 Esports Title'}
+              </span>
             </div>
 
             {/* Athlete Photo and Identity */}
             <div className="relative rounded-2xl overflow-hidden bg-dark-surface h-64 border border-dark-border">
               <img
-                src={currentLot?.participant?.photo || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=600&auto=format&fit=crop'}
+                src={currentLot?.participant?.photo || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop'}
                 alt={currentLot?.participant?.inGameName}
                 className="w-full h-full object-cover"
               />
@@ -403,42 +456,107 @@ const LiveAuctionRoom = () => {
                   {currentLot?.participant?.inGameName}
                 </h2>
                 <div className="flex items-center gap-2 mt-0.5 text-xs text-brand-emerald font-semibold">
-                  <span>🎯 {currentLot?.participant?.primaryRole}</span>
+                  <span>⚡ {currentLot?.participant?.primaryRole}</span>
                   <span>•</span>
-                  <span>UID: {currentLot?.participant?.inGameId}</span>
+                  <span>{currentLot?.participant?.inGameId}</span>
                 </div>
               </div>
             </div>
 
-            {/* Verified Gaming Stats */}
-            <div className="grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">K/D Ratio</span>
-                <span className="font-gaming text-lg font-bold text-brand-emerald mt-0.5 block">
-                  {currentLot?.participant?.kdRatio || '4.82'}
-                </span>
+            {/* Dynamic Verified Stats: Cricket vs Chess vs Carrom vs Esports */}
+            {auction.gameSlug === 'chess' ? (
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">FIDE Rating</span>
+                  <span className="font-gaming text-lg font-bold text-brand-emerald mt-0.5 block">
+                    {currentLot?.participant?.fideRating || '2724'}
+                  </span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Blitz Elo</span>
+                  <span className="font-gaming text-lg font-bold text-brand-gold mt-0.5 block">
+                    {currentLot?.participant?.blitzRating || '2758'}
+                  </span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Win Rate</span>
+                  <span className="font-gaming text-lg font-bold text-slate-100 mt-0.5 block">
+                    {currentLot?.participant?.winRate || '68.5'}%
+                  </span>
+                </div>
               </div>
-              <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Win Rate</span>
-                <span className="font-gaming text-lg font-bold text-slate-100 mt-0.5 block">
-                  {currentLot?.participant?.winRate || '38.5'}%
-                </span>
+            ) : auction.gameSlug === 'carrom' ? (
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">White Slams</span>
+                  <span className="font-gaming text-lg font-bold text-brand-emerald mt-0.5 block">
+                    {currentLot?.participant?.whiteSlams || '18'}
+                  </span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Pocket Accuracy</span>
+                  <span className="font-gaming text-lg font-bold text-brand-gold mt-0.5 block">
+                    94.2%
+                  </span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">National Rank</span>
+                  <span className="font-gaming text-xs font-bold text-slate-100 mt-1 block truncate">
+                    Top 5 AICF
+                  </span>
+                </div>
               </div>
-              <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Rank Tier</span>
-                <span className="font-gaming text-xs font-bold text-brand-gold mt-1 block truncate">
-                  {currentLot?.participant?.tierRank || 'Conqueror'}
-                </span>
+            ) : isPhysicalSport ? (
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Strike Rate</span>
+                  <span className="font-gaming text-lg font-bold text-brand-emerald mt-0.5 block">
+                    {currentLot?.participant?.strikeRate || '168.4'}
+                  </span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Wickets / Economy</span>
+                  <span className="font-gaming text-lg font-bold text-brand-gold mt-0.5 block">
+                    {currentLot?.participant?.wickets || '42'} / {currentLot?.participant?.bowlingEconomy || '6.8'}
+                  </span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Total Runs</span>
+                  <span className="font-gaming text-lg font-bold text-slate-100 mt-0.5 block">
+                    {currentLot?.participant?.runsScored || '1,240'}
+                  </span>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">K/D Ratio</span>
+                  <span className="font-gaming text-lg font-bold text-brand-emerald mt-0.5 block">
+                    {currentLot?.participant?.kdRatio || '4.82'}
+                  </span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Win Rate</span>
+                  <span className="font-gaming text-lg font-bold text-slate-100 mt-0.5 block">
+                    {currentLot?.participant?.winRate || '38.5'}%
+                  </span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border/50">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Rank Tier</span>
+                  <span className="font-gaming text-xs font-bold text-brand-gold mt-1 block truncate">
+                    {currentLot?.participant?.tierRank || 'Conqueror Top 100'}
+                  </span>
+                </div>
+              </div>
+            )}
 
-            {/* Trophies & Accolades */}
+            {/* Accolades */}
             <div className="space-y-1.5 pt-1">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
                 Championship Accolades
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {(currentLot?.participant?.esportsTrophies || ['BMPS 2023 Champion', 'BGIS Runner-up']).map((trophy) => (
+                {(currentLot?.participant?.esportsTrophies || ['Best All-Rounder 2024', 'Man of the Series']).map((trophy) => (
                   <span
                     key={trophy}
                     className="px-2.5 py-1 rounded-lg bg-dark-surface border border-brand-gold/30 text-[11px] text-brand-gold font-medium flex items-center gap-1"
@@ -460,18 +578,18 @@ const LiveAuctionRoom = () => {
           </div>
         </div>
 
-        {/* Center Column: Live Bidding Hammer & Controls (4 Cols) */}
+        {/* Center Column: Live Bidding Gavel & Controls (4 Cols) */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Live Hammer Clock Card */}
+          {/* Live Gavel Clock Card */}
           <div className="bg-dark-card border border-dark-border rounded-3xl p-6 text-center space-y-4 shadow-2xl relative overflow-hidden">
             <div className="flex items-center justify-center gap-2">
               <Clock className="w-4 h-4 text-brand-crimson animate-pulse" />
               <span className="text-xs font-bold text-brand-crimson uppercase tracking-wider">
-                Hammer Timer
+                Gavel Timer
               </span>
             </div>
 
-            {/* Massive Digital Countdown */}
+            {/* Digital Countdown */}
             <div className="py-2">
               <span
                 className={`font-mono text-6xl sm:text-7xl font-black transition-colors ${
@@ -516,14 +634,14 @@ const LiveAuctionRoom = () => {
                 {formatCurrency(currentBid)}
               </span>
               <p className="text-xs text-slate-300">
-                Leading Clan:{' '}
+                Leading Franchise:{' '}
                 <span className="font-bold text-brand-gold">
                   {currentLot?.currentBidderTeam?.name || 'No bids placed yet'}
                 </span>
               </p>
             </div>
 
-            {/* Error banner if validation fails */}
+            {/* Error banner */}
             {bidError && (
               <div className="p-3 bg-brand-crimson/20 border border-brand-crimson rounded-xl text-xs text-brand-crimson font-semibold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
@@ -569,7 +687,7 @@ const LiveAuctionRoom = () => {
               </>
             )}
 
-            {/* Host & Admin Hammer Strike Controls */}
+            {/* Host Gavel Controls */}
             <div className="pt-3 border-t border-dark-border/60 space-y-2">
               <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold block">
                 Auctioneer Gavel Controls
@@ -592,20 +710,20 @@ const LiveAuctionRoom = () => {
                   className="gap-1.5"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Next Athlete Lot</span>
+                  <span>Next Player Lot</span>
                 </Button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Participating Clans & Live Bid Stream (3 Cols) */}
+        {/* Right Column: Participating Franchises & Live Bid Stream (3 Cols) */}
         <div className="lg:col-span-3 space-y-6">
-          {/* Participating Clans & Budgets */}
+          {/* Participating Franchises & Purses */}
           <div className="bg-dark-card border border-dark-border rounded-3xl p-5 space-y-3">
             <h3 className="font-gaming text-base font-bold text-slate-100 uppercase flex items-center gap-1.5">
               <Users className="w-4 h-4 text-brand-emerald" />
-              <span>Participating Clans</span>
+              <span>Participating Franchises</span>
             </h3>
 
             <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
@@ -680,7 +798,7 @@ const LiveAuctionRoom = () => {
             </div>
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-brand-emerald">
-                HAMMER FALL — OFFICIAL LOT SOLD
+                GAVEL STRUCK — OFFICIAL LOT SOLD
               </span>
               <h2 className="font-gaming text-3xl font-extrabold text-slate-100 uppercase mt-1">
                 {lotResult.athleteName || currentLot?.participant?.inGameName}
@@ -699,7 +817,7 @@ const LiveAuctionRoom = () => {
               onClick={handleResetNextLot}
               className="w-full gap-2 shadow-glow-emerald"
             >
-              <span>Load Next Athlete Lot</span> &rarr;
+              <span>Load Next Player Lot</span> &rarr;
             </Button>
           </div>
         </div>

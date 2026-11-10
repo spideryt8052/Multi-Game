@@ -85,13 +85,13 @@ export const MOCK_GAMES = [
     defaultRoles: ['Crew Leader', 'Driver / Getaway', 'Shooter', 'Strategist'],
   },
 
-  // --- PHYSICAL SPORTS (REAL WORLD SPORTS) ---
+  // --- PHYSICAL & TABLETOP SPORTS ---
   {
     _id: 'sport_cricket_07',
     title: 'Cricket (IPL & Box Cricket)',
     slug: 'cricket',
     categoryType: 'physical_sports',
-    developer: 'BCCI / Local Premier Leagues',
+    developer: 'BCCI / Premier Associations',
     genre: 'Physical Sport',
     bannerImage: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200&auto=format&fit=crop',
     iconImage: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=200&auto=format&fit=crop',
@@ -101,7 +101,35 @@ export const MOCK_GAMES = [
     defaultRoles: ['Opening Batsman', 'Top Order Batsman', 'Hard-Hitting All-Rounder', 'Pace Bowler', 'Spin Bowler', 'Wicketkeeper Batsman'],
   },
   {
-    _id: 'sport_football_08',
+    _id: 'sport_chess_08',
+    title: 'Chess (Global League & Blitz)',
+    slug: 'chess',
+    categoryType: 'physical_sports',
+    developer: 'FIDE / Global Chess League',
+    genre: 'Mind & Board Sport',
+    bannerImage: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=1200&auto=format&fit=crop',
+    iconImage: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=200&auto=format&fit=crop',
+    description: 'High-stakes chess franchise drafts: Grandmasters (Board 1), International Masters, Blitz Specialists, and U-21 Prodigies.',
+    activeAuctionsCount: 1,
+    athletesCount: 145,
+    defaultRoles: ['Grandmaster (Board 1)', 'International Master (Board 2)', 'Rapid / Blitz Specialist', 'Junior Prodigy', 'Women Grandmaster'],
+  },
+  {
+    _id: 'sport_carrom_09',
+    title: 'Carrom (National Championship)',
+    slug: 'carrom',
+    categoryType: 'physical_sports',
+    developer: 'All India Carrom Federation',
+    genre: 'Tabletop Sport',
+    bannerImage: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?q=80&w=1200&auto=format&fit=crop',
+    iconImage: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?q=80&w=200&auto=format&fit=crop',
+    description: 'National and corporate carrom championship drafts: White Slam masters, Cut & Pocket specialists, and Doubles partners.',
+    activeAuctionsCount: 1,
+    athletesCount: 120,
+    defaultRoles: ['White Slam Specialist', 'Direct Striker', 'Cut & Pocket Master', 'Doubles Partner', 'Defensive Finisher'],
+  },
+  {
+    _id: 'sport_football_10',
     title: 'Football / Turf Soccer',
     slug: 'football',
     categoryType: 'physical_sports',
@@ -109,13 +137,13 @@ export const MOCK_GAMES = [
     genre: 'Physical Sport',
     bannerImage: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=1200&auto=format&fit=crop',
     iconImage: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=200&auto=format&fit=crop',
-    description: '5-a-side Turf Soccer and 11-a-side Football League drafts featuring Strikers, Midfield Playmakers, Defenders, and Goalkeepers.',
+    description: '5-a-side Turf Soccer and 11-a-side Football League drafts featuring Strikers, Midfielders, Defenders, and Goalkeepers.',
     activeAuctionsCount: 1,
     athletesCount: 240,
     defaultRoles: ['Center Forward / Striker', 'Winger', 'Attacking Midfielder', 'Center Back', 'Fullback', 'Goalkeeper'],
   },
   {
-    _id: 'sport_kabaddi_09',
+    _id: 'sport_kabaddi_11',
     title: 'Kabaddi Pro League',
     slug: 'kabaddi',
     categoryType: 'physical_sports',
@@ -123,13 +151,13 @@ export const MOCK_GAMES = [
     genre: 'Physical Sport',
     bannerImage: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=1200&auto=format&fit=crop',
     iconImage: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=200&auto=format&fit=crop',
-    description: 'High-intensity contact sports player draft: Main Raiders, Do-or-Die Specialists, Corner Defenders, and Cover Defenders.',
+    description: 'High-intensity contact sports player draft: Main Raiders, Do-or-Die Specialists, and Corner Defenders.',
     activeAuctionsCount: 1,
     athletesCount: 180,
     defaultRoles: ['Main Raider', 'Right Corner Defender', 'Left Corner Defender', 'Center Cover', 'All-Rounder'],
   },
   {
-    _id: 'sport_badminton_10',
+    _id: 'sport_badminton_12',
     title: 'Badminton Championship',
     slug: 'badminton',
     categoryType: 'physical_sports',
@@ -138,23 +166,9 @@ export const MOCK_GAMES = [
     bannerImage: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=1200&auto=format&fit=crop',
     iconImage: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=200&auto=format&fit=crop',
     description: 'Corporate and club badminton championship player auctions for Singles and Doubles team franchise bidding.',
-    activeAuctionsCount: 1,
+    activeAuctionsCount: 0,
     athletesCount: 95,
     defaultRoles: ['Singles Ace', 'Doubles Front Specialist', 'Doubles Back Smasher', 'Mixed Doubles Player'],
-  },
-  {
-    _id: 'sport_volleyball_11',
-    title: 'Volleyball Spikers Cup',
-    slug: 'volleyball',
-    categoryType: 'physical_sports',
-    developer: 'Volleyball Federation',
-    genre: 'Physical Sport',
-    bannerImage: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=1200&auto=format&fit=crop',
-    iconImage: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=200&auto=format&fit=crop',
-    description: 'Premier spikers volleyball league featuring franchise bidding for Hitters, Blockers, Setters, and Liberos.',
-    activeAuctionsCount: 0,
-    athletesCount: 78,
-    defaultRoles: ['Outside Hitter / Spiker', 'Middle Blocker', 'Setter', 'Libero', 'Opposite Hitter'],
   },
 ];
 
@@ -210,7 +224,75 @@ export const MOCK_AUCTIONS = [
     ],
   },
 
-  // 2. ESPORTS: BGMI LIVE AUCTION
+  // 2. CHESS: GLOBAL CHESS LEAGUE GRANDMASTER DRAFT (LIVE NOW)
+  {
+    _id: 'auc_chess_gcl_02',
+    title: 'Global Chess Premier League 2026 - Grandmaster Draft',
+    gameSlug: 'chess',
+    gameName: 'Chess (Global League & Blitz)',
+    categoryType: 'physical_sports',
+    organizerName: 'FIDE & Tech Mahindra Global League',
+    bannerImage: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=800&auto=format&fit=crop',
+    status: 'live',
+    auctionType: 'player',
+    startTime: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+    startingBid: 8000,
+    minimumIncrement: 500,
+    registeredParticipantsCount: 40,
+    teamBudgetLimit: 80000,
+    currentLot: {
+      participant: {
+        _id: 'part_chess_01',
+        inGameName: 'GM_Vidit_Gujrathi',
+        inGameId: 'FIDE ID: 5029465',
+        primaryRole: 'Grandmaster (Board 1 / Rapid Specialist)',
+        basePrice: 15000,
+        fideRating: 2724,
+        blitzRating: 2758,
+        winRate: 68.5,
+        matchesPlayed: 410,
+        tierRank: 'Super Grandmaster Top 25',
+        esportsTrophies: ['FIDE Grand Swiss Champion 2023', 'Chess Olympiad Gold Medalist'],
+        photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop',
+      },
+      currentBid: 28500,
+      currentBidderTeam: {
+        _id: 'team_chingari_gulf',
+        name: 'Chingari Gulf Titans',
+        tag: 'CGT',
+        remainingBudget: 51500,
+      },
+      lotEndsAt: new Date(Date.now() + 1000 * 20).toISOString(),
+      lotStatus: 'bidding',
+    },
+    biddingHistory: [
+      { id: 'ch1', amount: 15000, teamName: 'Alpine SG Pipers', time: '17:10:05' },
+      { id: 'ch2', amount: 18000, teamName: 'UpGrad Mumba Masters', time: '17:10:25' },
+      { id: 'ch3', amount: 23000, teamName: 'Chingari Gulf Titans', time: '17:10:48' },
+      { id: 'ch4', amount: 26000, teamName: 'Alpine SG Pipers', time: '17:11:10' },
+      { id: 'ch5', amount: 28500, teamName: 'Chingari Gulf Titans', time: '17:11:32' },
+    ],
+  },
+
+  // 3. CARROM: ALL-INDIA CARROM MASTERS (UPCOMING)
+  {
+    _id: 'auc_carrom_masters_03',
+    title: 'All-India Carrom Masters League 2026 - Season Player Draft',
+    gameSlug: 'carrom',
+    gameName: 'Carrom (National Championship)',
+    categoryType: 'physical_sports',
+    organizerName: 'All India Carrom Federation (AICF)',
+    bannerImage: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?q=80&w=800&auto=format&fit=crop',
+    status: 'upcoming',
+    auctionType: 'player',
+    startTime: new Date(Date.now() + 1000 * 60 * 60 * 36).toISOString(),
+    startingBid: 3000,
+    minimumIncrement: 250,
+    registeredParticipantsCount: 48,
+    teamBudgetLimit: 50000,
+  },
+
+  // 4. ESPORTS: BGMI LIVE AUCTION
   {
     _id: 'auc_bgmi_pro_01',
     title: 'BGMI Champions Cup Season 5 Player Auction',
@@ -259,7 +341,7 @@ export const MOCK_AUCTIONS = [
     ],
   },
 
-  // 3. PHYSICAL SPORT: FOOTBALL TURF LEAGUE (UPCOMING)
+  // 5. PHYSICAL SPORT: FOOTBALL TURF LEAGUE (UPCOMING)
   {
     _id: 'auc_foot_turf_02',
     title: 'Delhi National Turf Football Pro League - Season Draft',
@@ -270,14 +352,14 @@ export const MOCK_AUCTIONS = [
     bannerImage: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=800&auto=format&fit=crop',
     status: 'upcoming',
     auctionType: 'player',
-    startTime: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // 24 hours
+    startTime: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
     startingBid: 4000,
     minimumIncrement: 400,
     registeredParticipantsCount: 54,
     teamBudgetLimit: 80000,
   },
 
-  // 4. PHYSICAL SPORT: KABADDI PRO DRAFT (UPCOMING)
+  // 6. PHYSICAL SPORT: KABADDI PRO DRAFT (UPCOMING)
   {
     _id: 'auc_kabaddi_03',
     title: 'Pro Kabaddi State Roster Draft - Raiders & Corners',
@@ -288,14 +370,14 @@ export const MOCK_AUCTIONS = [
     bannerImage: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=800&auto=format&fit=crop',
     status: 'upcoming',
     auctionType: 'player',
-    startTime: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(), // 48 hours
+    startTime: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(),
     startingBid: 3000,
     minimumIncrement: 500,
     registeredParticipantsCount: 60,
     teamBudgetLimit: 60000,
   },
 
-  // 5. ESPORTS: VALORANT LIVE AUCTION
+  // 7. ESPORTS: VALORANT LIVE AUCTION
   {
     _id: 'auc_val_challengers_02',
     title: 'Valorant India Invitational 2026 Lot Auction',
@@ -342,23 +424,5 @@ export const MOCK_AUCTIONS = [
       { id: 'b14', amount: 18000, teamName: 'Velocity Gaming', time: '15:11:05' },
       { id: 'b15', amount: 21000, teamName: 'Orangutan Gaming', time: '15:11:21' },
     ],
-  },
-
-  // 6. PHYSICAL SPORT: BADMINTON COMPLETED AUCTION
-  {
-    _id: 'auc_badminton_04',
-    title: 'Premier Badminton Corporate League Auction',
-    gameSlug: 'badminton',
-    gameName: 'Badminton Championship',
-    categoryType: 'physical_sports',
-    organizerName: 'Apex Sports Guild',
-    bannerImage: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=800&auto=format&fit=crop',
-    status: 'completed',
-    auctionType: 'player',
-    startTime: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
-    endTime: new Date(Date.now() - 1000 * 60 * 60 * 68).toISOString(),
-    startingBid: 2500,
-    minimumIncrement: 250,
-    registeredParticipantsCount: 36,
   },
 ];
