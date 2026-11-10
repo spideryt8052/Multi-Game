@@ -99,18 +99,24 @@ const AuctionCard = ({ auction }) => {
           <div className="grid grid-cols-2 gap-2 bg-dark-surface/60 rounded-xl p-2.5 border border-dark-border/40 text-xs">
             <div>
               <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
-                {isLive ? t('auction.current_bid') : t('auction.starting_bid')}
+                {isLive ? t('auction.current_bid') : isCompleted ? t('auction.hammer_price') : t('auction.starting_bid')}
               </span>
               <span className="font-mono font-bold text-slate-100 text-sm">
-                {formatCurrency(isLive ? auction.currentLot?.currentBid || auction.startingBid : auction.startingBid)}
+                {formatCurrency(
+                  isLive
+                    ? auction.currentLot?.currentBid || auction.startingBid
+                    : isCompleted
+                    ? auction.winningHammerPrice || auction.startingBid
+                    : auction.startingBid
+                )}
               </span>
             </div>
             <div>
               <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
-                {t('auction.min_increment')}
+                {isCompleted ? t('auction.sold_to') : t('auction.min_increment')}
               </span>
-              <span className="font-mono font-semibold text-brand-emerald text-sm">
-                +{formatCurrency(auction.minimumIncrement || 50)}
+              <span className={`font-mono font-semibold text-sm truncate block ${isCompleted ? 'text-brand-gold' : 'text-brand-emerald'}`}>
+                {isCompleted ? auction.winnerTeam?.name || 'Top Clan' : `+${formatCurrency(auction.minimumIncrement || 50)}`}
               </span>
             </div>
           </div>
@@ -147,6 +153,12 @@ const AuctionCard = ({ auction }) => {
             <>
               <Flame className="w-4 h-4 animate-bounce" />
               <span>{t('auction.enter_room')}</span>
+            </>
+          ) : isCompleted ? (
+            <>
+              <Shield className="w-4 h-4 text-brand-gold" />
+              <span>View Concluded Results</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
             </>
           ) : (
             <>

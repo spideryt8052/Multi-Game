@@ -15,6 +15,8 @@ import {
   Calendar,
   Layers,
   Sparkles,
+  CheckCircle,
+  Clock,
 } from 'lucide-react';
 
 const GameDetail = () => {
@@ -22,10 +24,54 @@ const GameDetail = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('auctions'); // 'auctions', 'teams', 'rules'
 
-  const game = MOCK_GAMES.find((g) => g.slug === slug) || MOCK_GAMES[0];
+  const game =
+    MOCK_GAMES.find((g) => g.slug.toLowerCase() === (slug || '').toLowerCase()) || MOCK_GAMES[0];
   const gameAuctions = MOCK_AUCTIONS.filter((a) => a.gameSlug === game.slug);
+  const liveAuctionForGame = gameAuctions.find((a) => a.status === 'live');
 
   const gameRules = {
+    cricket: {
+      squadSize: '11 Active Players + 4 Reserves (Squad of 15)',
+      teamBudget: '₹1,00,000 Team Purse Cap',
+      basePrice: '₹5,000 - ₹10,000 Base Player Price',
+      roles: ['Opening Batsman', 'Top Order Batsman', 'Hard-Hitting All-Rounder', 'Pace Bowler', 'Spin Bowler', 'Wicketkeeper Batsman'],
+      specialRule: 'Mandatory 1 Wicketkeeper, at least 4 specialist Bowlers, and 2 All-Rounders required.',
+    },
+    football: {
+      squadSize: '7 Active Players + 3 Substitutes (Turf Format)',
+      teamBudget: '₹80,000 Total Club Purse',
+      basePrice: '₹4,000 Base Player Price',
+      roles: ['Center Forward / Striker', 'Winger', 'Attacking Midfielder', 'Center Back', 'Fullback', 'Goalkeeper'],
+      specialRule: 'Mandatory Goalkeeper acquisition. Minimum 2 Defenders required before squad qualifies.',
+    },
+    kabaddi: {
+      squadSize: '7 Mat Starters + 3 Substitutes (Squad of 10)',
+      teamBudget: '₹60,000 Club Purse',
+      basePrice: '₹3,000 Base Lot Price',
+      roles: ['Main Raider', 'Right Corner Defender', 'Left Corner Defender', 'Center Cover', 'All-Rounder'],
+      specialRule: 'Minimum 3 dedicated Raiders and 3 specialist Defenders required.',
+    },
+    chess: {
+      squadSize: '6 Boards (Icon GM, 2 Men Superstars, 2 Women Masters, 1 U-21 Prodigy)',
+      teamBudget: '₹80,000 Total Franchise Purse',
+      basePrice: '₹8,000 - ₹15,000 Base Player Price',
+      roles: ['Grandmaster (Board 1)', 'International Master (Board 2)', 'Rapid / Blitz Specialist', 'Junior Prodigy', 'Women Grandmaster'],
+      specialRule: 'Board 1 Icon must have FIDE Rating > 2650. Women and Junior quotas strictly enforced.',
+    },
+    carrom: {
+      squadSize: '4 Active Board Players + 1 Substitute',
+      teamBudget: '₹50,000 Club Purse Cap',
+      basePrice: '₹3,000 Base Player Price',
+      roles: ['White Slam Specialist', 'Direct Striker', 'Cut & Pocket Master', 'Doubles Partner', 'Defensive Finisher'],
+      specialRule: 'Each team must have at least 1 verified White Slam specialist.',
+    },
+    badminton: {
+      squadSize: '4 Active Racquet Players',
+      teamBudget: '₹45,000 Club Purse',
+      basePrice: '₹3,000 Base Price',
+      roles: ['Singles Ace', 'Doubles Front Specialist', 'Doubles Back Smasher', 'Mixed Doubles Player'],
+      specialRule: 'At least 1 Singles Ace and 1 verified Doubles specialist pair.',
+    },
     bgmi: {
       squadSize: '4 Active Players + 1 Substitute',
       teamBudget: '₹50,000 Total Purse Limit',
@@ -47,16 +93,30 @@ const GameDetail = () => {
       roles: ['Rusher', 'Sniper', 'Granadier', 'Captain'],
       specialRule: 'Fast hammer timer: 20 seconds lot timeout. Mandatory Rusher slot.',
     },
+    cs2: {
+      squadSize: '5 Active Players + 1 Coach',
+      teamBudget: '₹55,000 Team Purse',
+      basePrice: '₹2,500 Base Price',
+      roles: ['AWPer', 'Entry Fragger', 'IGL', 'Lurker', 'Support'],
+      specialRule: 'Max 1 AWPer per roster. Strict 30s auction hammer timer.',
+    },
     fifa: {
       squadSize: '1 Main Competitor + 1 Reserve',
       teamBudget: '₹25,000 Purse Limit',
       basePrice: '₹2,000 Base',
-      roles: ['Pro Esports Athlete', 'Tactical Analyst'],
+      roles: ['Forward Specialist', 'Midfield Controller', 'Defensive Master', 'Goalkeeper'],
       specialRule: 'Direct 1v1 draft. Winner signs exclusive season contract with clan.',
+    },
+    gta: {
+      squadSize: '4 Crew Members',
+      teamBudget: '₹40,000 Syndicate Purse',
+      basePrice: '₹2,000 Base Price',
+      roles: ['Crew Leader', 'Driver / Getaway', 'Shooter', 'Strategist'],
+      specialRule: 'Roleplay server syndicate draft with custom clan territory bidding.',
     },
   };
 
-  const currentRules = gameRules[game.slug] || gameRules.bgmi;
+  const currentRules = gameRules[game.slug] || gameRules.cricket || gameRules.bgmi;
 
   return (
     <div className="space-y-12 pb-16">
@@ -74,9 +134,9 @@ const GameDetail = () => {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-emerald/20 text-brand-emerald border border-brand-emerald/30">
-                  {game.genre}
+                  {game.categoryType === 'physical_sports' ? '🏏 Physical Sport' : '🎮 Esports'}
                 </span>
-                <span className="text-xs text-slate-400 font-semibold">Dev: {game.developer}</span>
+                <span className="text-xs text-slate-400 font-semibold">{game.genre}</span>
               </div>
               <h1 className="font-gaming text-4xl sm:text-5xl font-extrabold text-slate-100 uppercase tracking-wide">
                 {game.title}
@@ -87,12 +147,21 @@ const GameDetail = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Link to={`/auctions/live`}>
-                <Button variant="danger" size="md" className="gap-2">
-                  <Flame className="w-4 h-4" />
-                  <span>Join {game.title} Live Room</span>
-                </Button>
-              </Link>
+              {liveAuctionForGame ? (
+                <Link to={`/auctions/live/${liveAuctionForGame._id}`}>
+                  <Button variant="danger" size="md" className="gap-2 shadow-glow-crimson">
+                    <Flame className="w-4 h-4 animate-pulse" />
+                    <span>Join {game.title} Live Room</span>
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/auctions/upcoming">
+                  <Button variant="primary" size="md" className="gap-2 shadow-glow-emerald">
+                    <Calendar className="w-4 h-4" />
+                    <span>View Upcoming Tournaments</span>
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -137,10 +206,22 @@ const GameDetail = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 bg-dark-card border border-dark-border rounded-2xl">
-                <Gamepad2 className="w-12 h-12 text-slate-500 mx-auto mb-3" />
-                <h3 className="text-lg font-bold text-slate-100">No current auctions for {game.title}</h3>
-                <p className="text-xs text-slate-400 mt-1">Check back soon or register a squad for upcoming seasons.</p>
+              <div className="text-center py-16 bg-dark-card border border-dark-border rounded-2xl space-y-4">
+                <Gamepad2 className="w-12 h-12 text-slate-500 mx-auto" />
+                <div>
+                  <h3 className="text-lg font-bold text-slate-100">No active auctions for {game.title} at this moment</h3>
+                  <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+                    New seasonal tournaments are being scheduled by organizers. You can register your athlete profile or review rules below.
+                  </p>
+                </div>
+                <div className="pt-2 flex items-center justify-center gap-3">
+                  <Link to="/register">
+                    <Button variant="primary" size="sm">Register Athlete Profile</Button>
+                  </Link>
+                  <Link to="/auctions/upcoming">
+                    <Button variant="outline" size="sm">Explore All Upcoming</Button>
+                  </Link>
+                </div>
               </div>
             )}
           </div>
@@ -167,7 +248,7 @@ const GameDetail = () => {
                 <span className="font-gaming text-lg font-bold text-slate-100 mt-0.5 block">{currentRules.squadSize}</span>
               </div>
               <div className="bg-dark-surface p-4 rounded-xl border border-dark-border/60">
-                <span className="text-[11px] text-slate-400 uppercase tracking-wider block">Clan Purse Limit</span>
+                <span className="text-[11px] text-slate-400 uppercase tracking-wider block">Purse Cap</span>
                 <span className="font-gaming text-lg font-bold text-brand-emerald mt-0.5 block">{currentRules.teamBudget}</span>
               </div>
               <div className="bg-dark-surface p-4 rounded-xl border border-dark-border/60">
@@ -208,4 +289,3 @@ const GameDetail = () => {
 };
 
 export default GameDetail;
-

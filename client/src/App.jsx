@@ -57,12 +57,14 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/games" element={<GamesList />} />
           <Route path="/games/:slug" element={<GameDetail />} />
+          <Route path="/auctions" element={<LiveAuctions />} />
           <Route path="/auctions/live" element={<LiveAuctions />} />
           <Route path="/auctions/upcoming" element={<UpcomingAuctions />} />
           <Route path="/auctions/completed" element={<CompletedAuctions />} />
           <Route path="/auctions/:id" element={<AuctionDetail />} />
           <Route path="/auctions/live/:id" element={<LiveAuctionRoom />} />
           <Route path="/rules" element={<AuctionRules />} />
+          <Route path="/rules/:sport" element={<AuctionRules />} />
 
           {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
@@ -74,8 +76,10 @@ function App() {
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/profile" element={<UserDashboard />} />
           <Route path="/notifications" element={<UserDashboard />} />
+          <Route path="/team" element={<TeamDashboard />} />
           <Route path="/teams" element={<TeamDashboard />} />
           <Route path="/teams/create" element={<CreateTeam />} />
+          <Route path="/create-team" element={<CreateTeam />} />
 
           {/* Protected Admin Console */}
           <Route path="/admin" element={<AdminOverview />} />

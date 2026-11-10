@@ -44,10 +44,10 @@ const CreateTeam = () => {
             🛡️
           </div>
           <h2 className="font-gaming text-3xl font-extrabold text-slate-100 uppercase">
-            Create Esports Team / Clan
+            Create Sports Franchise / Team
           </h2>
           <p className="text-xs text-slate-400">
-            Form your competitive franchise to register for auctions and bid on premier athletes.
+            Form your competitive franchise or esports clan to register for auctions and bid on premier athletes.
           </p>
         </div>
 
