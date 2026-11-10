@@ -1,0 +1,15 @@
+{
+  "name": "multi-game-live-auction-platform",
+  "version": "1.0.0",
+  "description": "Multi-Game Live Auction Platform (MERN Stack with Socket.IO & Bilingual Support)",
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "start": "node server/server.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
+

@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0B0E14;
+  color: #F8FAFC;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .font-gaming {
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.03em;
+}
+
+/* Custom Esports Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0E14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A3447;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00E599;
+}
+
+/* Custom utility classes */
+.card-esports {
+  background: #141A23;
+  border: 1px solid #2A3447;
+  transition: all 0.25s ease-in-out;
+}
+
+.card-esports:hover {
+  border-color: #00E599;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -6px rgba(0, 229, 153, 0.15);
+}
+
+.pulse-indicator {
+  position: relative;
+}
+
+.pulse-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 9999px;
+  background: inherit;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  opacity: 0.75;
+}
+
