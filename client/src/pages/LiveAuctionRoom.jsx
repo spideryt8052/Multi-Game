@@ -649,41 +649,92 @@ const LiveAuctionRoom = () => {
               </div>
             )}
 
-            {/* Quick Live Bid Buttons */}
+            {/* ROLE-BASED BIDDING CONTROLS OR SPECTATOR / PLAYER VIEW */}
             {!lotResult && (
               <>
-                <div className="space-y-2 pt-2">
-                  <span className="text-xs text-slate-400 font-semibold block text-left">
-                    {t('auction.quick_bid')}:
-                  </span>
-                  <div className="grid grid-cols-3 gap-2">
-                    {quickBidOptions.map((amount) => (
-                      <button
-                        key={amount}
-                        type="button"
-                        onClick={() => handlePlaceBid(amount)}
-                        className="py-3 px-2 rounded-xl bg-brand-emerald text-black font-gaming font-extrabold text-base hover:bg-[#00c985] shadow-glow-emerald active:scale-95 transition-all flex flex-col items-center justify-center leading-tight"
-                      >
-                        <span>+{formatCurrency(amount - currentBid)}</span>
-                        <span className="text-[11px] font-mono opacity-80">{formatCurrency(amount)}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                {/* 1. TEAM OWNER: FULL BIDDING BUTTONS */}
+                {user?.role === 'team_owner' ? (
+                  <>
+                    <div className="space-y-2 pt-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-300 font-bold flex items-center gap-1.5">
+                          <Shield className="w-3.5 h-3.5 text-brand-emerald" />
+                          <span>Team Owner Bidding Controls:</span>
+                        </span>
+                        <span className="text-brand-emerald font-mono font-bold">
+                          Purse: {formatCurrency(myTeam.remainingBudget)}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        {quickBidOptions.map((amount) => (
+                          <button
+                            key={amount}
+                            type="button"
+                            onClick={() => handlePlaceBid(amount)}
+                            className="py-3 px-2 rounded-xl bg-brand-emerald text-black font-gaming font-extrabold text-base hover:bg-[#00c985] shadow-glow-emerald active:scale-95 transition-all flex flex-col items-center justify-center leading-tight"
+                          >
+                            <span>+{formatCurrency(amount - currentBid)}</span>
+                            <span className="text-[11px] font-mono opacity-80">{formatCurrency(amount)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                {/* Custom Bid Form */}
-                <form onSubmit={handleCustomBidSubmit} className="pt-2 flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={customBidInput}
-                    onChange={(e) => setCustomBidInput(e.target.value)}
-                    placeholder={`Min ${formatCurrency(currentBid + increment)}`}
-                    className="w-full px-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-brand-emerald"
-                  />
-                  <Button type="submit" variant="primary" size="sm" className="whitespace-nowrap">
-                    Bid Custom
-                  </Button>
-                </form>
+                    {/* Custom Bid Form */}
+                    <form onSubmit={handleCustomBidSubmit} className="pt-2 flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={customBidInput}
+                        onChange={(e) => setCustomBidInput(e.target.value)}
+                        placeholder={`Min ${formatCurrency(currentBid + increment)}`}
+                        className="w-full px-3 py-2 bg-dark-surface border border-dark-border rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-brand-emerald"
+                      />
+                      <Button type="submit" variant="primary" size="sm" className="whitespace-nowrap">
+                        Bid Custom
+                      </Button>
+                    </form>
+                  </>
+                ) : user?.role === 'gamer' ? (
+                  /* 2. PLAYER / KHILADI VIEW */
+                  <div className="p-4 bg-brand-cyan/10 border border-brand-cyan/30 rounded-2xl text-left space-y-2">
+                    <div className="flex items-center gap-2 text-brand-cyan font-bold text-xs uppercase tracking-wider">
+                      <Trophy className="w-4 h-4" />
+                      <span>Athlete Mode (Khiladi View)</span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Aap Player profile se logged in hain. Franchises live room mein aapki boli laga rahi hain. Boli lagane ka adhikar keval verified Team Owners ke paas hota hai.
+                    </p>
+                    <div className="pt-1 flex items-center justify-between text-[11px] text-slate-400">
+                      <span>Status: In Draft Pool</span>
+                      <Link to="/dashboard" className="text-brand-cyan hover:underline font-semibold">
+                        My Player Hub &rarr;
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  /* 3. DARSHAK (SPECTATOR) OR GUEST VIEW */
+                  <div className="p-4 bg-dark-surface border border-dark-border rounded-2xl text-left space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-slate-200 font-bold text-xs uppercase tracking-wider">
+                        <Eye className="w-4 h-4 text-brand-emerald" />
+                        <span>Darshak Mode (Spectator Stream)</span>
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-emerald/15 text-brand-emerald font-bold">
+                        LIVE SPECTATING
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Aap live neelami dekh rahe hain! Boli lagana chahte hain? Apni franchise register karein aur team wallet se players ko apni team mein shamil karein.
+                    </p>
+                    <div className="pt-2 flex items-center gap-2">
+                      <Link to="/register" className="w-full">
+                        <Button variant="outline" size="sm" className="w-full text-xs">
+                          Register as Team Owner to Bid
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </>
             )}
 

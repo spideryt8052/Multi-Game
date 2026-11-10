@@ -3,17 +3,57 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../context/LanguageContext';
 import Button from '../../components/common/Button';
-import { Mail, Lock, AlertCircle, Sparkles } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Sparkles, Eye, Trophy, Shield, Briefcase } from 'lucide-react';
 
 const Login = () => {
   const { login } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
+  const [identifier, setIdentifier] = useState('admin@arenaauctions.gg');
+  const [password, setPassword] = useState('Admin@123');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [activeRoleTab, setActiveRoleTab] = useState('admin');
+
+  // Quick Demo Credentials for all 4 roles
+  const demoAccounts = {
+    darshak: {
+      title: 'Darshak (Viewer)',
+      email: 'viewer@arena.gg',
+      pass: 'Viewer@123',
+      desc: 'View live auctions, inspect player lot stats, spectator mode.',
+      redirect: '/dashboard',
+    },
+    player: {
+      title: 'Player / Khiladi',
+      email: 'rohit@cricket.in',
+      pass: 'Gamer@123',
+      desc: 'Player lot status, auction pool verification & contract tracking.',
+      redirect: '/dashboard',
+    },
+    team_owner: {
+      title: 'Team Owner (Malik)',
+      email: 'owner@mumbaititans.com',
+      pass: 'Owner@123',
+      desc: 'Full live bidding buttons active, purse management & squad drafting.',
+      redirect: '/teams',
+    },
+    admin: {
+      title: 'SuperAdmin',
+      email: 'admin@arenaauctions.gg',
+      pass: 'Admin@123',
+      desc: 'Full gavel hammer controls, participant KYC approvals & sports catalog.',
+      redirect: '/admin',
+    },
+  };
+
+  const handleRoleSelect = (roleKey) => {
+    setActiveRoleTab(roleKey);
+    const acc = demoAccounts[roleKey];
+    setIdentifier(acc.email);
+    setPassword(acc.pass);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,8 +63,11 @@ const Login = () => {
     try {
       const result = await login(identifier, password);
       if (result.success) {
-        if (result.user.role === 'admin') {
+        const userRole = result.user.role;
+        if (userRole === 'admin') {
           navigate('/admin');
+        } else if (userRole === 'team_owner') {
+          navigate('/teams');
         } else {
           navigate('/dashboard');
         }
@@ -39,17 +82,80 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md bg-dark-card border border-dark-border rounded-3xl p-8 space-y-6 shadow-2xl relative">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-10 space-y-6 shadow-2xl relative">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-brand-emerald/15 border border-brand-emerald/30 text-brand-emerald flex items-center justify-center text-xl font-bold mx-auto mb-2">
             ⚡
           </div>
           <h2 className="font-gaming text-3xl font-extrabold text-slate-100 uppercase">
-            {t('nav.login')}
+            Sign In to Arena
           </h2>
           <p className="text-xs text-slate-400">
-            Sign in to access your clan purse, place live bids, or register for upcoming auctions.
+            Login based on your role: Darshak, Player, Team Owner, or SuperAdmin.
+          </p>
+        </div>
+
+        {/* 4 Role Selector Tabs */}
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider text-center">
+            Quick 1-Click Role Login Demo:
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-dark-surface rounded-xl border border-dark-border">
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('darshak')}
+              className={`py-2 px-1 text-[11px] font-bold rounded-lg transition-all flex flex-col items-center gap-1 ${
+                activeRoleTab === 'darshak'
+                  ? 'bg-brand-emerald text-black shadow-sm font-extrabold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Darshak</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('player')}
+              className={`py-2 px-1 text-[11px] font-bold rounded-lg transition-all flex flex-col items-center gap-1 ${
+                activeRoleTab === 'player'
+                  ? 'bg-brand-emerald text-black shadow-sm font-extrabold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Trophy className="w-3.5 h-3.5" />
+              <span>Player</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('team_owner')}
+              className={`py-2 px-1 text-[11px] font-bold rounded-lg transition-all flex flex-col items-center gap-1 ${
+                activeRoleTab === 'team_owner'
+                  ? 'bg-brand-emerald text-black shadow-sm font-extrabold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span>Team Owner</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('admin')}
+              className={`py-2 px-1 text-[11px] font-bold rounded-lg transition-all flex flex-col items-center gap-1 ${
+                activeRoleTab === 'admin'
+                  ? 'bg-brand-emerald text-black shadow-sm font-extrabold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Briefcase className="w-3.5 h-3.5" />
+              <span>Admin</span>
+            </button>
+          </div>
+          <p className="text-[11px] text-slate-400 text-center italic pt-1">
+            {demoAccounts[activeRoleTab].desc}
           </p>
         </div>
 
@@ -99,24 +205,15 @@ const Login = () => {
           </div>
 
           <Button type="submit" variant="primary" size="md" loading={loading} className="w-full mt-2">
-            Sign In to Arena
+            Sign In as {demoAccounts[activeRoleTab].title}
           </Button>
         </form>
 
         <div className="text-center pt-2 text-xs text-slate-400">
-          <span>Don't have an esports account? </span>
+          <span>Naye user hain? </span>
           <Link to="/register" className="text-brand-emerald font-semibold hover:underline">
-            {t('nav.register')}
+            Register Here (Darshak, Player, Owner, Admin)
           </Link>
-        </div>
-
-        {/* Demo credentials hint for convenience */}
-        <div className="mt-4 p-3 bg-dark-surface border border-dark-border/60 rounded-xl text-[11px] text-slate-400 space-y-1">
-          <p className="font-semibold text-slate-300 flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-brand-gold" /> Demo Credentials:
-          </p>
-          <p>Admin: <span className="text-slate-200">admin@arenaauctions.gg</span> / <span className="text-slate-200">Admin@123</span></p>
-          <p>Team Owner: <span className="text-slate-200">owner@godl.gg</span> / <span className="text-slate-200">Owner@123</span></p>
         </div>
       </div>
     </div>
@@ -124,4 +221,3 @@ const Login = () => {
 };
 
 export default Login;
-

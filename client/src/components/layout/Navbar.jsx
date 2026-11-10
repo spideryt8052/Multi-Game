@@ -126,7 +126,13 @@ const Navbar = () => {
                       {user?.username || 'User'}
                     </span>
                     <span className="text-[10px] text-brand-emerald uppercase font-bold tracking-wider">
-                      {user?.role?.replace('_', ' ') || 'Player'}
+                      {user?.role === 'user'
+                        ? '👁️ Darshak'
+                        : user?.role === 'gamer'
+                        ? '🏃 Player'
+                        : user?.role === 'team_owner'
+                        ? '🛡️ Team Owner'
+                        : '👑 Admin'}
                     </span>
                   </div>
                 </button>

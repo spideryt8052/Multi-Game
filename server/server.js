@@ -14,6 +14,7 @@ import authRoutes from './routes/authRoutes.js';
 import gameRoutes from './routes/gameRoutes.js';
 import auctionRoutes from './routes/auctionRoutes.js';
 import teamRoutes from './routes/teamRoutes.js';
+import { apiLimiter, authLimiter } from './middleware/rateLimiter.js';
 
 // Socket handlers
 import { registerAuctionSocketHandlers } from './sockets/auctionRoomHandler.js';
@@ -44,7 +45,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // Mount API routes
-app.use('/api/auth', authRoutes);
+app.use('/api', apiLimiter);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/teams', teamRoutes);
