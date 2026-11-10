@@ -37,6 +37,17 @@ const auctionParticipantSchema = new mongoose.Schema(
       winRate: { type: Number, default: 0 },
       tierRank: { type: String, default: 'Unranked' },
       esportsTrophies: [{ type: String }],
+      // Physical Sports statistics
+      runsScored: { type: Number, default: 0 },
+      battingAverage: { type: Number, default: 0 },
+      strikeRate: { type: Number, default: 0 },
+      wickets: { type: Number, default: 0 },
+      bowlingEconomy: { type: Number, default: 0 },
+      goalsScored: { type: Number, default: 0 },
+      assists: { type: Number, default: 0 },
+      raidPoints: { type: Number, default: 0 },
+      tacklePoints: { type: Number, default: 0 },
+      jerseyNumber: { type: Number },
     },
     photo: {
       type: String,

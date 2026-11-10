@@ -17,13 +17,26 @@ import {
   CheckCircle2,
   ArrowRight,
   Sparkles,
+  Dumbbell,
 } from 'lucide-react';
 
 const Home = () => {
   const { t } = useTranslation();
+  const [categoryFilter, setCategoryFilter] = useState('all'); // 'all', 'esports', 'physical_sports'
   const [selectedGameFilter, setSelectedGameFilter] = useState('all');
 
-  const liveAuctions = MOCK_AUCTIONS.filter((a) => a.status === 'live');
+  // Filter games by category
+  const filteredGames =
+    categoryFilter === 'all'
+      ? MOCK_GAMES
+      : MOCK_GAMES.filter((g) => g.categoryType === categoryFilter);
+
+  // Filter auctions
+  const liveAuctions =
+    categoryFilter === 'all'
+      ? MOCK_AUCTIONS.filter((a) => a.status === 'live')
+      : MOCK_AUCTIONS.filter((a) => a.status === 'live' && a.categoryType === categoryFilter);
+
   const upcomingAuctions = MOCK_AUCTIONS.filter((a) => a.status === 'upcoming');
   const completedAuctions = MOCK_AUCTIONS.filter((a) => a.status === 'completed');
 
@@ -61,6 +74,43 @@ const Home = () => {
             {t('hero.subtitle')}
           </p>
 
+          {/* Category Toggle Tabs */}
+          <div className="mt-8 flex items-center justify-center gap-2 max-w-md mx-auto bg-dark-card border border-dark-border p-1 rounded-2xl">
+            <button
+              type="button"
+              onClick={() => setCategoryFilter('all')}
+              className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+                categoryFilter === 'all'
+                  ? 'bg-brand-emerald text-black shadow-glow-emerald'
+                  : 'text-slate-400 hover:text-slate-100'
+              }`}
+            >
+              All Categories
+            </button>
+            <button
+              type="button"
+              onClick={() => setCategoryFilter('physical_sports')}
+              className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                categoryFilter === 'physical_sports'
+                  ? 'bg-brand-emerald text-black shadow-glow-emerald'
+                  : 'text-slate-400 hover:text-slate-100'
+              }`}
+            >
+              <span>🏏 Physical Sports</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setCategoryFilter('esports')}
+              className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                categoryFilter === 'esports'
+                  ? 'bg-brand-emerald text-black shadow-glow-emerald'
+                  : 'text-slate-400 hover:text-slate-100'
+              }`}
+            >
+              <span>🎮 Esports</span>
+            </button>
+          </div>
+
           {/* Action CTAs */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/auctions/live">
@@ -82,15 +132,15 @@ const Home = () => {
             <div className="flex items-center gap-2 shrink-0">
               <span className="w-2 h-2 rounded-full bg-brand-crimson animate-ping" />
               <span className="font-bold text-brand-crimson uppercase tracking-wider text-[11px]">
-                LIVE LOT UPDATE:
+                LIVE BID:
               </span>
             </div>
             <div className="truncate px-3 font-mono text-slate-200">
-              <span className="text-brand-emerald font-bold">Soul_Akshat</span> currently at{' '}
-              <span className="text-brand-gold font-bold">₹14,500</span> by GodLike Esports (BGMI Cup)
+              <span className="text-brand-emerald font-bold">Rohit_Verma (All-Rounder)</span> at{' '}
+              <span className="text-brand-gold font-bold">₹32,500</span> by Mumbai Titans (Box Cricket League)
             </div>
             <Link
-              to="/auctions/live/auc_bgmi_pro_01"
+              to="/auctions/live/auc_cricket_ipl_01"
               className="shrink-0 text-brand-emerald hover:underline font-semibold flex items-center gap-1"
             >
               <span>Watch</span> &rarr;
@@ -100,16 +150,16 @@ const Home = () => {
           {/* Metric Stats Strip */}
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
             <div className="bg-dark-card border border-dark-border p-4 rounded-xl text-center">
-              <p className="font-gaming text-2xl font-bold text-brand-emerald">₹15,000,000+</p>
+              <p className="font-gaming text-2xl font-bold text-brand-emerald">{t('hero.stats_volume')}</p>
               <p className="text-xs text-slate-400 mt-0.5">Total Bidding Volume</p>
             </div>
             <div className="bg-dark-card border border-dark-border p-4 rounded-xl text-center">
-              <p className="font-gaming text-2xl font-bold text-slate-100">4,500+</p>
-              <p className="text-xs text-slate-400 mt-0.5">Verified Esports Athletes</p>
+              <p className="font-gaming text-2xl font-bold text-slate-100">{t('hero.stats_players')}</p>
+              <p className="text-xs text-slate-400 mt-0.5">Verified Athletes</p>
             </div>
             <div className="bg-dark-card border border-dark-border p-4 rounded-xl text-center">
-              <p className="font-gaming text-2xl font-bold text-brand-gold">350+</p>
-              <p className="text-xs text-slate-400 mt-0.5">Registered Esports Clans</p>
+              <p className="font-gaming text-2xl font-bold text-brand-gold">{t('hero.stats_teams')}</p>
+              <p className="text-xs text-slate-400 mt-0.5">Clubs & Franchises</p>
             </div>
             <div className="bg-dark-card border border-dark-border p-4 rounded-xl text-center">
               <p className="font-gaming text-2xl font-bold text-brand-cyan">99.98%</p>
@@ -146,12 +196,12 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 3. POPULAR GAMES HUB */}
+      {/* 3. POPULAR GAMES & PHYSICAL SPORTS HUB */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 pb-3 border-b border-dark-border gap-4">
           <div>
             <span className="text-brand-emerald text-xs font-bold uppercase tracking-wider">
-              Esports Titles
+              Competitive Categories
             </span>
             <h2 className="font-gaming text-3xl font-extrabold text-slate-100 uppercase tracking-wide mt-1">
               {t('games.title')}
@@ -162,12 +212,12 @@ const Home = () => {
             to="/games"
             className="text-xs font-bold text-brand-emerald hover:underline flex items-center gap-1"
           >
-            <span>Browse All Games ({MOCK_GAMES.length})</span> &rarr;
+            <span>Browse All ({filteredGames.length})</span> &rarr;
           </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {MOCK_GAMES.map((game) => (
+          {filteredGames.map((game) => (
             <GameCard key={game._id} game={game} />
           ))}
         </div>
@@ -181,7 +231,7 @@ const Home = () => {
               Registration Open
             </span>
             <h2 className="font-gaming text-3xl font-extrabold text-slate-100 uppercase tracking-wide mt-1">
-              Upcoming Esports Auctions
+              Upcoming Tournaments & League Drafts
             </h2>
           </div>
 
@@ -222,7 +272,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 5. HOW IT WORKS (IPL & ESPORTS AUCTION WORKFLOW) */}
+      {/* 5. HOW IT WORKS (IPL & SPORTS AUCTION WORKFLOW) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-dark-card border border-dark-border rounded-3xl p-8 lg:p-12 relative overflow-hidden">
           <div className="text-center max-w-2xl mx-auto mb-12">
@@ -230,10 +280,10 @@ const Home = () => {
               Step-by-Step System
             </span>
             <h2 className="font-gaming text-3xl sm:text-4xl font-extrabold text-slate-100 uppercase tracking-wide mt-1">
-              How Live Esports Auctions Work
+              How Live Sports & Esports Auctions Work
             </h2>
             <p className="text-xs text-slate-400 mt-2">
-              A transparent, high-stakes auction environment powered by verified gaming stats and real-time Socket.IO bidding.
+              A transparent, high-stakes auction environment powered by verified player stats and real-time Socket.IO bidding.
             </p>
           </div>
 
@@ -244,7 +294,7 @@ const Home = () => {
               </div>
               <h4 className="font-gaming text-lg font-bold text-slate-100">1. Athlete Profile & KYC</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Gamers register their in-game UID, K/D ratio, tier ranks, and tournament achievements to enter the auction lot pool.
+                Players submit batting/bowling averages, K/D ratio, tier ranks, or club achievements to enter the auction lot pool.
               </p>
             </div>
 
@@ -252,9 +302,9 @@ const Home = () => {
               <div className="w-10 h-10 rounded-xl bg-brand-cyan/15 text-brand-cyan font-gaming text-xl font-bold flex items-center justify-center border border-brand-cyan/30">
                 02
               </div>
-              <h4 className="font-gaming text-lg font-bold text-slate-100">2. Clan Purse Allocation</h4>
+              <h4 className="font-gaming text-lg font-bold text-slate-100">2. Franchise Purse Limit</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Team owners register with authorized clan budgets. Server enforces strict budget caps before every bid.
+                Team owners register with verified purse caps. Server enforces strict purse limits before every bid.
               </p>
             </div>
 
@@ -264,7 +314,7 @@ const Home = () => {
               </div>
               <h4 className="font-gaming text-lg font-bold text-slate-100">3. Live Hammer Room</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Lots are presented one by one. Team owners compete with increment buttons under a 30-second ticking clock.
+                Lots are presented with photographs and stats. Franchise managers compete with increment buttons under a ticking clock.
               </p>
             </div>
 
@@ -274,7 +324,7 @@ const Home = () => {
               </div>
               <h4 className="font-gaming text-lg font-bold text-slate-100">4. Instant Roster Lock</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Sold athletes are instantly added to the winning team's official tournament roster with budget deducted automatically.
+                Sold athletes are instantly signed to the winning team's official tournament squad with purse deducted automatically.
               </p>
             </div>
           </div>
@@ -308,18 +358,18 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 7. ORGANIZER & TEAM CTA BANNER */}
+      {/* 7. ORGANIZER & FRANCHISE BANNER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-r from-emerald-950/60 via-dark-card to-dark-surface border border-brand-emerald/40 rounded-3xl p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-glow-emerald">
           <div className="space-y-3 max-w-xl">
             <span className="px-3 py-1 rounded-full bg-brand-emerald/20 text-brand-emerald text-xs font-bold uppercase tracking-wider border border-brand-emerald/30">
-              Tournament Organizers
+              League & Tournament Organizers
             </span>
             <h3 className="font-gaming text-3xl sm:text-4xl font-extrabold text-slate-100 uppercase">
-              Host Your Esports Auction on Arena
+              Host Your Physical Sports or Esports Auction
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Custom game rules, role rosters, automatic budget deduction, and live audio-visual hammer rooms. Launch your competitive tournament draft in minutes.
+              Custom player roles, squad purse limits, automatic budget deduction, and live audio-visual gavel rooms. Launch your competitive tournament draft in minutes.
             </p>
           </div>
           <div className="shrink-0 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -330,7 +380,7 @@ const Home = () => {
             </Link>
             <Link to="/rules">
               <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                Review Rule Engine
+                Review Sports Rules
               </Button>
             </Link>
           </div>
@@ -341,4 +391,3 @@ const Home = () => {
 };
 
 export default Home;
-

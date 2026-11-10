@@ -15,16 +15,16 @@
     "logout": "Logout"
   },
   "hero": {
-    "badge": "OFFICIAL ESPORTS BIDDING PLATFORM",
-    "title_part1": "Multi-Game Live",
-    "title_part2": "Esports Auction",
+    "badge": "OFFICIAL ESPORTS & PHYSICAL SPORTS LIVE AUCTIONS",
+    "title_part1": "Multi-Game & Sports",
+    "title_part2": "Live Auction",
     "title_part3": "Platform",
-    "subtitle": "Build your championship roster. Compete in real-time high-intensity live bidding with millisecond-grade sync, automated budget validation, and game-specific tournament rules.",
+    "subtitle": "Build your dream championship squad for Esports (BGMI, Valorant) and Real Physical Sports (Cricket, Football, Kabaddi). Compete in real-time live bidding with millisecond sync, automated purse validation, and official league tournament rules.",
     "cta_live": "Enter Live Auction Rooms",
     "cta_register": "Register Squad / Athlete",
-    "stats_volume": "₹15M+ Bids Executed",
-    "stats_players": "4,500+ Verified Athletes",
-    "stats_teams": "350+ Esports Clans"
+    "stats_volume": "₹25M+ Bids Executed",
+    "stats_players": "6,500+ Verified Athletes",
+    "stats_teams": "480+ Sports Franchises"
   },
   "auction": {
     "live_now": "LIVE NOW",

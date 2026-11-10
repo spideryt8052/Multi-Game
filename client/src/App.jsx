@@ -10,6 +10,7 @@ import GameDetail from './pages/GameDetail';
 import LiveAuctions from './pages/LiveAuctions';
 import UpcomingAuctions from './pages/UpcomingAuctions';
 import CompletedAuctions from './pages/CompletedAuctions';
+import AuctionDetail from './pages/AuctionDetail';
 import LiveAuctionRoom from './pages/LiveAuctionRoom';
 import AuctionRules from './pages/AuctionRules';
 
@@ -59,7 +60,7 @@ function App() {
           <Route path="/auctions/live" element={<LiveAuctions />} />
           <Route path="/auctions/upcoming" element={<UpcomingAuctions />} />
           <Route path="/auctions/completed" element={<CompletedAuctions />} />
-          <Route path="/auctions/:id" element={<LiveAuctionRoom />} />
+          <Route path="/auctions/:id" element={<AuctionDetail />} />
           <Route path="/auctions/live/:id" element={<LiveAuctionRoom />} />
           <Route path="/rules" element={<AuctionRules />} />
 

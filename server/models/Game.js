@@ -27,6 +27,12 @@ const gameSchema = new mongoose.Schema(
       required: [true, 'Please provide genre'],
       trim: true,
     },
+    categoryType: {
+      type: String,
+      enum: ['esports', 'physical_sports'],
+      default: 'esports',
+      index: true,
+    },
     bannerImage: {
       type: String,
       default: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop',

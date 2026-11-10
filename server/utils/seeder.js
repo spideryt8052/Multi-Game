@@ -40,37 +40,39 @@ const seedData = async () => {
       inGameId: 'Admin#0001',
     });
 
-    const teamOwnerUser = await User.create({
-      fullName: 'Chetan Chandgude',
-      username: 'kronten_godl',
-      email: 'owner@godl.gg',
+    const cricketOwnerUser = await User.create({
+      fullName: 'Vikramaditya Singhania',
+      username: 'mumbai_titans_owner',
+      email: 'owner@mumbaititans.com',
       mobileNumber: '+919888888888',
       password: 'Owner@123',
       role: ROLES.TEAM_OWNER,
       country: 'India',
-      gamingExperience: 'Professional Esports',
-      inGameId: 'Kronten#GODL',
+      gamingExperience: 'Intermediate',
+      inGameId: 'TitansBoss',
     });
 
     const athleteUser = await User.create({
-      fullName: 'Akshat Goel',
-      username: 'soul_akshat',
-      email: 'akshat@soul.gg',
+      fullName: 'Rohit Sharma (Club All-Rounder)',
+      username: 'rohit_cricketer',
+      email: 'rohit@cricket.in',
       mobileNumber: '+919777777777',
       password: 'Gamer@123',
       role: ROLES.GAMER,
       country: 'India',
       gamingExperience: 'Professional Esports',
-      inGameId: '5129481920',
+      inGameId: 'Jersey #45',
     });
 
-    console.log(' Created test users (Admin, Team Owner, Athlete).');
+    console.log(' Created test users (Admin, Franchise Owner, Athlete).');
 
-    // 2. Create Games
+    // 2. Create Games & Physical Sports
     const games = await Game.insertMany([
+      // Esports
       {
         title: 'BGMI',
         slug: 'bgmi',
+        categoryType: 'esports',
         developer: 'Krafton',
         genre: 'Battle Royale',
         bannerImage: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop',
@@ -80,6 +82,7 @@ const seedData = async () => {
       {
         title: 'Valorant',
         slug: 'valorant',
+        categoryType: 'esports',
         developer: 'Riot Games',
         genre: 'Tactical FPS',
         bannerImage: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=1200&auto=format&fit=crop',
@@ -89,108 +92,124 @@ const seedData = async () => {
       {
         title: 'Free Fire MAX',
         slug: 'freefire',
+        categoryType: 'esports',
         developer: 'Garena',
         genre: 'Mobile Battle Royale',
         bannerImage: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop',
-        description: 'Fast-paced mobile esports player drafts, rusher auctions, and clan budget auctions.',
+        description: 'Fast-paced mobile esports player drafts and clan budget auctions.',
         defaultRoles: ['Rusher', 'Sniper', 'Granadier', 'Captain'],
       },
+
+      // Physical Sports
       {
-        title: 'Counter-Strike 2',
-        slug: 'cs2',
-        developer: 'Valve',
-        genre: 'Tactical FPS',
-        bannerImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1200&auto=format&fit=crop',
-        description: 'Classic competitive PC esports auctions featuring AWPers and Entry Fraggers.',
-        defaultRoles: ['AWPer', 'Entry Fragger', 'IGL', 'Support'],
+        title: 'Cricket (IPL & Box Cricket)',
+        slug: 'cricket',
+        categoryType: 'physical_sports',
+        developer: 'BCCI / Premier Associations',
+        genre: 'Physical Sport',
+        bannerImage: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200&auto=format&fit=crop',
+        description: 'Premier Cricket tournament live auctions: Batsmen, Pace Bowlers, Spinners, All-Rounders, and Wicketkeepers.',
+        defaultRoles: ['Opening Batsman', 'Top Order Batsman', 'Hard-Hitting All-Rounder', 'Pace Bowler', 'Spin Bowler', 'Wicketkeeper Batsman'],
       },
       {
-        title: 'FIFA / EA Sports FC',
-        slug: 'fifa',
-        developer: 'EA Sports',
-        genre: 'Sports Simulation',
-        bannerImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop',
-        description: 'Pro gamer draft and club roster live auctions with player contracts.',
-        defaultRoles: ['Pro Competitor', 'Tactical Analyst'],
+        title: 'Football / Turf Soccer',
+        slug: 'football',
+        categoryType: 'physical_sports',
+        developer: 'Turf & Club Associations',
+        genre: 'Physical Sport',
+        bannerImage: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=1200&auto=format&fit=crop',
+        description: '5-a-side Turf Soccer and 11-a-side Football League player drafts.',
+        defaultRoles: ['Striker', 'Winger', 'Central Midfielder', 'Defender', 'Goalkeeper'],
+      },
+      {
+        title: 'Kabaddi Pro League',
+        slug: 'kabaddi',
+        categoryType: 'physical_sports',
+        developer: 'State & National Kabaddi Federations',
+        genre: 'Physical Sport',
+        bannerImage: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=1200&auto=format&fit=crop',
+        description: 'High-intensity contact sports player draft: Main Raiders and Corner Defenders.',
+        defaultRoles: ['Main Raider', 'Right Corner Defender', 'Left Corner Defender', 'All-Rounder'],
       },
     ]);
 
-    const bgmiGame = games[0];
-    const valGame = games[1];
+    const cricketGame = games.find((g) => g.slug === 'cricket');
+    const bgmiGame = games.find((g) => g.slug === 'bgmi');
 
-    console.log(` Created ${games.length} esports titles.`);
+    console.log(` Created ${games.length} titles (Both Esports & Physical Sports).`);
 
     // 3. Create Teams
-    const godlTeam = await Team.create({
-      name: 'GodLike Esports',
-      tag: 'GODL',
-      game: bgmiGame._id,
-      owner: teamOwnerUser._id,
-      description: 'Premier Indian esports organization competing in Tier 1 championships.',
-      allocatedBudget: 50000,
-      remainingBudget: 38500,
+    const titansTeam = await Team.create({
+      name: 'Mumbai Titans',
+      tag: 'MT',
+      game: cricketGame._id,
+      owner: cricketOwnerUser._id,
+      description: 'Premier Box Cricket & Turf franchise with championship history.',
+      allocatedBudget: 100000,
+      remainingBudget: 67500,
     });
 
-    const soulTeam = await Team.create({
-      name: 'Team Soul',
-      tag: 'SOUL',
-      game: bgmiGame._id,
-      owner: teamOwnerUser._id,
-      description: 'Fan favorite champions of BMPS and PMCO.',
-      allocatedBudget: 50000,
-      remainingBudget: 42000,
+    const warriorsTeam = await Team.create({
+      name: 'Andheri Warriors',
+      tag: 'AW',
+      game: cricketGame._id,
+      owner: cricketOwnerUser._id,
+      description: 'Challenger cricket team known for aggressive top-order batting.',
+      allocatedBudget: 100000,
+      remainingBudget: 80000,
     });
 
-    console.log(' Created competitive teams.');
+    console.log(' Created physical sports teams.');
 
-    // 4. Create Auction
-    const bgmiAuction = await Auction.create({
-      title: 'BGMI Champions Cup Season 5 Player Auction',
-      game: bgmiGame._id,
+    // 4. Create Cricket Mega Auction (Live)
+    const cricketAuction = await Auction.create({
+      title: 'Mumbai Premier Box Cricket League 2026 - Season 4 Auction',
+      game: cricketGame._id,
       organizer: adminUser._id,
-      bannerImage: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop',
+      bannerImage: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=800&auto=format&fit=crop',
       status: AUCTION_STATUS.LIVE,
       auctionType: 'player',
       startTime: new Date(),
-      startingBid: 2500,
-      minimumIncrement: 250,
-      maxTeams: 16,
-      maxParticipants: 48,
-      teamBudgetLimit: 50000,
+      startingBid: 5000,
+      minimumIncrement: 500,
+      maxTeams: 8,
+      maxParticipants: 72,
+      teamBudgetLimit: 100000,
       currentLot: {
-        currentBid: 14500,
-        currentBidderTeam: godlTeam._id,
-        currentBidderUser: teamOwnerUser._id,
+        currentBid: 32500,
+        currentBidderTeam: titansTeam._id,
+        currentBidderUser: cricketOwnerUser._id,
         lotTimerSeconds: 25,
         lotStatus: LOT_STATUS.BIDDING,
       },
     });
 
-    // 5. Create Lot Participant
+    // 5. Create Athlete Lot
     const participant = await AuctionParticipant.create({
-      auction: bgmiAuction._id,
+      auction: cricketAuction._id,
       user: athleteUser._id,
-      inGameName: 'Soul_Akshat',
-      inGameId: '5129481920',
-      primaryRole: 'Assaulter / Finisher',
+      inGameName: 'Rohit_Verma',
+      inGameId: 'Jersey #45',
+      primaryRole: 'All-Rounder (Right-Hand Bat / Fast Medium)',
       stats: {
-        kdRatio: 4.82,
-        matchesPlayed: 450,
-        winRate: 38.5,
-        tierRank: 'Conqueror Top 100',
-        esportsTrophies: ['BMPS 2023 Champion', 'BGIS Runner-up'],
+        runsScored: 1240,
+        strikeRate: 168.4,
+        wickets: 42,
+        bowlingEconomy: 6.8,
+        matchesPlayed: 56,
+        tierRank: 'Ranji / Club A-Division',
+        esportsTrophies: ['Best All-Rounder 2024', 'Man of the Series - Corporate Cup'],
       },
-      basePrice: 5000,
+      basePrice: 10000,
       status: PARTICIPANT_STATUS.ACTIVE_LOT,
       orderIndex: 1,
     });
 
-    // Link participant to auction
-    bgmiAuction.currentLot.participant = participant._id;
-    await bgmiAuction.save();
+    cricketAuction.currentLot.participant = participant._id;
+    await cricketAuction.save();
 
-    console.log(' Seeded live auction room and active athlete lot.');
-    console.log('\n Database Seeding Completed Successfully! You can now start the server and client.');
+    console.log(' Seeded Cricket Mega Auction with live player lot.');
+    console.log('\n Database Seeding with Physical Sports & Esports Completed Successfully!');
     process.exit(0);
   } catch (error) {
     console.error(' Seeding Failed:', error);
@@ -199,4 +218,3 @@ const seedData = async () => {
 };
 
 seedData();
-
