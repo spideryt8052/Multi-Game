@@ -24,3 +24,4 @@ if (fs.existsSync(clientDist)) {
   console.error('✗ Build failed: client/dist not found!');
   process.exit(1);
 }
+

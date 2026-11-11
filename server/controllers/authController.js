@@ -18,6 +18,7 @@ export const register = async (req, res, next) => {
       inGameId,
       role,
       profilePicture,
+      playerProfile,
     } = req.body;
 
     // Check if user already exists
@@ -40,6 +41,7 @@ export const register = async (req, res, next) => {
       favoriteGames: favoriteGames || [],
       inGameId,
       role: role || 'gamer',
+      playerProfile: playerProfile || undefined,
       profilePicture:
         profilePicture ||
         'https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=400&auto=format&fit=crop',
@@ -60,6 +62,7 @@ export const register = async (req, res, next) => {
           inGameId: user.inGameId,
           country: user.country,
           profilePicture: user.profilePicture,
+          playerProfile: user.playerProfile,
         },
         token,
       },
@@ -111,6 +114,7 @@ export const login = async (req, res, next) => {
         inGameId: user.inGameId,
         country: user.country,
         profilePicture: user.profilePicture,
+        playerProfile: user.playerProfile,
       },
       token,
     });

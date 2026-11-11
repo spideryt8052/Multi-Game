@@ -48,6 +48,14 @@ const UserDashboard = () => {
 
   const role = user?.role || 'user'; // 'user' (Viewer), 'gamer' (Player), 'team_owner', 'admin'
 
+  const playerProfile = (() => {
+    try {
+      const saved = localStorage.getItem('arena_player_profile');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return user?.playerProfile || null;
+  })();
+
   const sampleRegistrations = [
     {
       id: 'reg_1',
@@ -422,6 +430,91 @@ const UserDashboard = () => {
                   <div className="bg-dark-surface p-4 rounded-2xl border border-dark-border">
                     <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Leading Franchise</span>
                     <span className="font-gaming text-base font-bold text-brand-cyan mt-1 block truncate">Mumbai Titans</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* DYNAMIC SPORT-SPECIFIC REGISTRATION LOT CARD */}
+              <div className="bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-dark-border pb-4">
+                  <div>
+                    <span className="text-[10px] text-brand-emerald font-bold uppercase tracking-wider block">
+                      OFFICIAL TOURNAMENT LOT SPECIFICATION
+                    </span>
+                    <h4 className="font-gaming text-xl sm:text-2xl font-bold text-slate-100 uppercase">
+                      {playerProfile?.primarySport || 'Cricket (IPL & Box Cricket)'} Dynamic Roster Profile
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-3 py-1 rounded-full bg-brand-cyan/15 text-brand-cyan font-bold border border-brand-cyan/30">
+                      {playerProfile?.primaryRole || 'All-Rounder'}
+                    </span>
+                    <span className="text-xs px-2.5 py-1 rounded-full bg-brand-emerald/15 text-brand-emerald font-mono font-bold">
+                      {formatCurrency(playerProfile?.expectedBasePrice || 10000)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div className="bg-dark-surface p-3.5 rounded-xl border border-dark-border">
+                    <span className="text-[10px] text-slate-400 block uppercase">Batting / Playing Style</span>
+                    <span className="font-semibold text-slate-100 mt-0.5 block">
+                      {playerProfile?.battingStyle === 'lhb'
+                        ? 'Left-Hand Bat (LHB - Lefty)'
+                        : 'Right-Hand Bat (RHB - Righty)'}
+                    </span>
+                  </div>
+                  <div className="bg-dark-surface p-3.5 rounded-xl border border-dark-border">
+                    <span className="text-[10px] text-slate-400 block uppercase">Bowling / Weapon Spec</span>
+                    <span className="font-semibold text-slate-100 mt-0.5 block">
+                      {playerProfile?.bowlingStyle ? playerProfile.bowlingStyle.toUpperCase() : 'Right-Arm Fast-Medium'}
+                    </span>
+                  </div>
+                  <div className="bg-dark-surface p-3.5 rounded-xl border border-dark-border">
+                    <span className="text-[10px] text-slate-400 block uppercase">Tournament Tier</span>
+                    <span className="font-semibold text-brand-gold mt-0.5 block capitalize">
+                      {playerProfile?.playerCategory || 'Uncapped (Emerging Star)'}
+                    </span>
+                  </div>
+                  <div className="bg-dark-surface p-3.5 rounded-xl border border-dark-border">
+                    <span className="text-[10px] text-slate-400 block uppercase">Jersey # / UID</span>
+                    <span className="font-mono font-bold text-brand-emerald mt-0.5 block">
+                      {user?.inGameId || `Jersey #${playerProfile?.jerseyNumber || 45}`}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Verified Career Performance HUD */}
+                <div className="bg-dark-surface p-4 rounded-2xl border border-dark-border flex flex-wrap items-center justify-between gap-4 text-xs">
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase">Career Matches</span>
+                    <span className="font-mono text-base font-bold text-slate-100">
+                      {playerProfile?.stats?.matchesPlayed || 42}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase">Total Runs / Finishes</span>
+                    <span className="font-mono text-base font-bold text-brand-emerald">
+                      {playerProfile?.stats?.runsScored || 890}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase">Strike Rate / KD</span>
+                    <span className="font-mono text-base font-bold text-brand-gold">
+                      {playerProfile?.stats?.strikeRate || 154.2}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase">Wickets Taken</span>
+                    <span className="font-mono text-base font-bold text-slate-100">
+                      {playerProfile?.stats?.wickets || 26}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase">Bowling Economy</span>
+                    <span className="font-mono text-base font-bold text-slate-100">
+                      {playerProfile?.stats?.bowlingEconomy || 6.9}
+                    </span>
                   </div>
                 </div>
               </div>

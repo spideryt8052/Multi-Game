@@ -6,6 +6,11 @@ import { useTranslation } from '../context/LanguageContext';
 import { MOCK_AUCTIONS } from '../utils/mockData';
 import { formatCurrency } from '../utils/formatCurrency';
 import { playBidSound, playSoldHammerSound, playTickSound, playWarningSound } from '../utils/soundEffects';
+import {
+  SQUAD_RULES_CONFIG,
+  evaluateSquadCompliance,
+  validatePurseAndSquadLimits,
+} from '../utils/squadRulesConfig';
 import Button from '../components/common/Button';
 import Badge from '../components/common/Badge';
 import confetti from 'canvas-confetti';
@@ -29,6 +34,12 @@ import {
   Sparkles,
   Bot,
   Activity,
+  BookOpen,
+  Check,
+  X,
+  Target,
+  ChevronRight,
+  Eye,
 } from 'lucide-react';
 
 const LiveAuctionRoom = () => {
@@ -47,9 +58,11 @@ const LiveAuctionRoom = () => {
   const [secondsLeft, setSecondsLeft] = useState(25);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [bidError, setBidError] = useState('');
+  const [bidWarning, setBidWarning] = useState('');
   const [customBidInput, setCustomBidInput] = useState('');
   const [lotResult, setLotResult] = useState(null);
   const [simulatedRivalsActive, setSimulatedRivalsActive] = useState(false);
+  const [showRulesModal, setShowRulesModal] = useState(false);
 
   // Is this a physical sport or esports lot?
   const isPhysicalSport =
@@ -58,7 +71,7 @@ const LiveAuctionRoom = () => {
     auction.gameSlug === 'football' ||
     auction.gameSlug === 'kabaddi';
 
-  // Team wallet
+  // Team wallet and active squad
   const [myTeam, setMyTeam] = useState(() => {
     if (auction.gameSlug === 'cricket') {
       return {
@@ -66,6 +79,13 @@ const LiveAuctionRoom = () => {
         name: 'Mumbai Titans',
         tag: 'MT',
         remainingBudget: 67500,
+        roster: [
+          { name: 'Virat_Sharma', role: 'Batsman', acquiredPrice: 12000 },
+          { name: 'Shikhar_Rao', role: 'Batsman', acquiredPrice: 8500 },
+          { name: 'Hardik_Patel', role: 'All-Rounder', acquiredPrice: 15000 },
+          { name: 'Mohammed_Siraj', role: 'Bowler', acquiredPrice: 9000 },
+          { name: 'Yuzvendra_Chahal', role: 'Bowler', acquiredPrice: 10500 },
+        ],
       };
     }
     return {
@@ -73,7 +93,30 @@ const LiveAuctionRoom = () => {
       name: 'GodLike Esports',
       tag: 'GODL',
       remainingBudget: 38500,
+      roster: [
+        { name: 'GodL_ClutchGod', role: 'IGL', acquiredPrice: 12500 },
+        { name: 'GodL_Jonathan', role: 'Assaulter', acquiredPrice: 18000 },
+      ],
     };
+  });
+
+  // Calculate live squad compliance against tournament rules
+  const compliance = evaluateSquadCompliance(myTeam.roster, auction.gameSlug);
+  const activeGameConfig = SQUAD_RULES_CONFIG[auction.gameSlug] || SQUAD_RULES_CONFIG.cricket;
+  const currentLotRole = currentLot?.participant?.primaryRole || '';
+
+  // Check if current lot matches any role currently needed by the squad
+  const matchingNeededRole = compliance.roleBreakdown.find((r) => {
+    const pRole = currentLotRole.toLowerCase();
+    if (r.roleId === 'batsman' && pRole.includes('bat') && !pRole.includes('wicket') && !pRole.includes('all-round')) return r.needed > 0;
+    if (r.roleId === 'bowler' && (pRole.includes('bowl') || pRole.includes('pace') || pRole.includes('spin'))) return r.needed > 0;
+    if (r.roleId === 'all_rounder' && (pRole.includes('all-round') || pRole.includes('allrounder'))) return r.needed > 0;
+    if (r.roleId === 'wicketkeeper' && (pRole.includes('wicket') || pRole.includes('wk'))) return r.needed > 0;
+    if (r.roleId === 'igl' && pRole.includes('igl')) return r.needed > 0;
+    if (r.roleId === 'assaulter' && (pRole.includes('assault') || pRole.includes('entry'))) return r.needed > 0;
+    if (r.roleId === 'sniper' && (pRole.includes('sniper') || pRole.includes('dmr'))) return r.needed > 0;
+    if (r.roleId === 'duelist' && pRole.includes('duelist')) return r.needed > 0;
+    return false;
   });
 
   const participatingTeams =
@@ -214,12 +257,31 @@ const LiveAuctionRoom = () => {
   }, [simulatedRivalsActive, secondsLeft, currentLot, auction, lotResult, soundEnabled]);
 
   const handleLotSoldEffect = (soldData) => {
+    const finalPrice = soldData?.finalPrice || currentLot?.currentBid;
+    const winnerTeam = soldData?.teamName || currentLot?.currentBidderTeam?.name || 'Winning Franchise';
+
     setLotResult({
       type: 'sold',
-      teamName: soldData?.teamName || currentLot?.currentBidderTeam?.name || 'Winning Franchise',
-      amount: soldData?.finalPrice || currentLot?.currentBid,
+      teamName: winnerTeam,
+      amount: finalPrice,
       athleteName: currentLot?.participant?.inGameName,
     });
+
+    // If my franchise won this player, add to roster & deduct purse
+    if (winnerTeam === myTeam.name || currentLot?.currentBidderTeam?.name === myTeam.name) {
+      setMyTeam((prev) => ({
+        ...prev,
+        remainingBudget: Math.max(0, prev.remainingBudget - finalPrice),
+        roster: [
+          ...prev.roster,
+          {
+            name: currentLot?.participant?.inGameName || 'Acquired Athlete',
+            role: currentLot?.participant?.primaryRole || 'Player',
+            acquiredPrice: finalPrice,
+          },
+        ],
+      }));
+    }
 
     if (soundEnabled) playSoldHammerSound();
 
@@ -242,6 +304,7 @@ const LiveAuctionRoom = () => {
 
   const handlePlaceBid = (amount) => {
     setBidError('');
+    setBidWarning('');
 
     if (!isAuthenticated) {
       setBidError('Please sign in to place live auction bids.');
@@ -253,9 +316,23 @@ const LiveAuctionRoom = () => {
       return;
     }
 
-    if (amount > myTeam.remainingBudget) {
-      setBidError(`Bid amount exceeds your franchise purse of ${formatCurrency(myTeam.remainingBudget)}`);
+    // Validate using official tournament & purse reserve rules
+    const validation = validatePurseAndSquadLimits(
+      myTeam,
+      currentLot?.participant,
+      amount,
+      auction.gameSlug
+    );
+
+    if (!validation.isValid) {
+      setBidError(validation.errors[0]);
+      setTimeout(() => setBidError(''), 5000);
       return;
+    }
+
+    if (validation.warnings.length > 0) {
+      setBidWarning(validation.warnings[0]);
+      setTimeout(() => setBidWarning(''), 6000);
     }
 
     if (soundEnabled) playBidSound();
@@ -325,9 +402,9 @@ const LiveAuctionRoom = () => {
       setCurrentLot({
         participant: {
           _id: 'part_cric_02',
-          inGameName: 'Jasprit_Bumrah (Pace Specialist)',
+          inGameName: 'Jasprit_Bumrah',
           inGameId: 'Jersey #93',
-          primaryRole: 'Fast Bowler (Right-Arm Fast / Yorker Master)',
+          primaryRole: 'Fast Bowler (Right-Arm Fast / Yorker Specialist)',
           basePrice: 15000,
           wickets: 68,
           bowlingEconomy: 5.4,
@@ -392,7 +469,17 @@ const LiveAuctionRoom = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+          {/* Rules & Squad Balance Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setShowRulesModal(true)}
+            className="px-3 py-1.5 rounded-xl border border-brand-gold/40 bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-gold text-xs font-bold flex items-center gap-1.5 transition-colors"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>IPL / Squad Rules</span>
+          </button>
+
           {/* Toggle Rivals Simulation */}
           <button
             type="button"
@@ -438,15 +525,18 @@ const LiveAuctionRoom = () => {
                 ACTIVE LOT
               </span>
               <span className="text-xs text-brand-emerald font-bold uppercase">
-                {isPhysicalSport ? '🏏 Physical Sport' : '🎮 Esports Title'}
+                {auction.gameName}
               </span>
             </div>
 
-            {/* Athlete Photo and Identity */}
-            <div className="relative rounded-2xl overflow-hidden bg-dark-surface h-64 border border-dark-border">
+            {/* Athlete Photo Card */}
+            <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-dark-surface border border-dark-border">
               <img
-                src={currentLot?.participant?.photo || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop'}
-                alt={currentLot?.participant?.inGameName}
+                src={
+                  currentLot?.participant?.photo ||
+                  'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=600&auto=format&fit=crop'
+                }
+                alt="Athlete"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-dark-card via-transparent to-transparent" />
@@ -643,9 +733,30 @@ const LiveAuctionRoom = () => {
 
             {/* Error banner */}
             {bidError && (
-              <div className="p-3 bg-brand-crimson/20 border border-brand-crimson rounded-xl text-xs text-brand-crimson font-semibold flex items-center gap-2">
+              <div className="p-3 bg-brand-crimson/20 border border-brand-crimson rounded-xl text-xs text-brand-crimson font-semibold flex items-center gap-2 text-left">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{bidError}</span>
+              </div>
+            )}
+
+            {/* Warning banner (Purse Reserve or Role Cap notice) */}
+            {bidWarning && (
+              <div className="p-3 bg-brand-gold/20 border border-brand-gold/60 rounded-xl text-xs text-brand-gold font-semibold flex items-center gap-2 text-left">
+                <AlertCircle className="w-4 h-4 shrink-0 text-brand-gold" />
+                <span>{bidWarning}</span>
+              </div>
+            )}
+
+            {/* Match Recommendation Pill */}
+            {matchingNeededRole && (
+              <div className="p-2.5 bg-brand-emerald/10 border border-brand-emerald/40 rounded-xl text-xs text-brand-emerald flex items-center justify-between">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>IPL Target: Open {matchingNeededRole.label} slot!</span>
+                </div>
+                <span className="text-[10px] bg-brand-emerald/20 px-2 py-0.5 rounded font-mono">
+                  Need {matchingNeededRole.needed} more
+                </span>
               </div>
             )}
 
@@ -840,6 +951,177 @@ const LiveAuctionRoom = () => {
         </div>
       </div>
 
+      {/* --- IPL & ESPORTS TOURNAMENT SQUAD COMPLIANCE & LINEUP TRACKER --- */}
+      <div className="bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-dark-border pb-5">
+          <div>
+            <div className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-brand-emerald" />
+              <h3 className="font-gaming text-xl sm:text-2xl font-bold text-slate-100 uppercase">
+                {auction.gameSlug === 'cricket' ? 'IPL Franchise Squad Tracker & Quota Balance' : 'Esports Roster Balance & Lineup Tracker'}
+              </h3>
+              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-brand-emerald/15 text-brand-emerald border border-brand-emerald/30">
+                {myTeam.name} ({myTeam.tag})
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-1">
+              Official Tournament Composition Rules: Minimum {compliance.squadMin} to Maximum {compliance.squadMax} players. Balanced role distribution verified in real-time.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setShowRulesModal(true)}
+              className="px-4 py-2 rounded-xl bg-dark-surface border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/10 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>View Full IPL Rulebook</span>
+            </button>
+            <div className="px-4 py-2 rounded-xl bg-dark-surface border border-brand-emerald/30 text-right">
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Qualification Status</span>
+              <span className={`text-xs font-bold uppercase ${compliance.isQualified ? 'text-brand-emerald' : 'text-brand-gold'}`}>
+                {compliance.isQualified ? '✓ Qualified For Matches' : '⏳ Incomplete Squad'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Overall Squad Count & Purse Reserve Gauges */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Squad Count Progress */}
+          <div className="bg-dark-surface p-4 rounded-2xl border border-dark-border space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">Squad Capacity:</span>
+              <span className="font-mono font-bold text-slate-100">
+                {compliance.currentCount} / {compliance.squadMin} Players
+              </span>
+            </div>
+            <div className="w-full h-2.5 rounded-full bg-dark-card overflow-hidden">
+              <div
+                className="h-full bg-brand-emerald rounded-full transition-all duration-500"
+                style={{ width: `${compliance.progressPercentage}%` }}
+              />
+            </div>
+            <span className="text-[11px] text-slate-400 block">
+              {compliance.slotsNeededForMin > 0
+                ? `Need ${compliance.slotsNeededForMin} more players to meet tournament qualification minimum.`
+                : '✓ Minimum squad size successfully achieved!'}
+            </span>
+          </div>
+
+          {/* IPL Purse Reserve Calculator */}
+          <div className="bg-dark-surface p-4 rounded-2xl border border-dark-border space-y-1">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
+              IPL Purse Reserve Protection
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="font-mono text-xl font-bold text-brand-gold">
+                {formatCurrency(compliance.slotsNeededForMin * activeGameConfig.minBasePrice)}
+              </span>
+              <span className="text-[11px] text-slate-400">
+                reserved for {compliance.slotsNeededForMin} open slots
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-400 block">
+              Safe max bid for current lot:{' '}
+              <strong className="text-brand-emerald font-mono">
+                {formatCurrency(
+                  Math.max(
+                    0,
+                    myTeam.remainingBudget - compliance.slotsNeededForMin * activeGameConfig.minBasePrice
+                  )
+                )}
+              </strong>
+            </span>
+          </div>
+
+          {/* Franchise Purse Remaining */}
+          <div className="bg-dark-surface p-4 rounded-2xl border border-dark-border space-y-1">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
+              Active Franchise Purse
+            </span>
+            <span className="font-gaming text-2xl font-black text-brand-emerald block">
+              {formatCurrency(myTeam.remainingBudget)}
+            </span>
+            <span className="text-[11px] text-slate-400 block">
+              Initial Purse: {formatCurrency(activeGameConfig.purseLimit)}
+            </span>
+          </div>
+        </div>
+
+        {/* Dynamic Role Breakdown Grid */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+              Role Quotas & Lineup Balance:
+            </h4>
+            <span className="text-[11px] text-slate-500">All positions must meet minimums</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {compliance.roleBreakdown.map((r) => (
+              <div
+                key={r.roleId}
+                className={`p-4 rounded-2xl border transition-all ${
+                  r.isMinMet
+                    ? 'bg-brand-emerald/10 border-brand-emerald/30 shadow-glow-emerald/10'
+                    : 'bg-dark-surface border-dark-border/80'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-gaming text-sm font-bold text-slate-100">{r.label}</span>
+                  <span
+                    className={`font-mono text-xs font-extrabold px-2 py-0.5 rounded-md ${
+                      r.isMinMet
+                        ? 'bg-brand-emerald/20 text-brand-emerald'
+                        : 'bg-brand-crimson/20 text-brand-crimson'
+                    }`}
+                  >
+                    {r.count} / {r.min}
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1 leading-snug">
+                  {r.labelHinglish || r.label} (Max: {r.max})
+                </p>
+                <div className="mt-2.5 pt-2 border-t border-dark-border/40 flex items-center justify-between text-[11px]">
+                  <span className="text-slate-400">Status:</span>
+                  <span
+                    className={`font-semibold ${
+                      r.isMinMet ? 'text-brand-emerald' : 'text-brand-gold'
+                    }`}
+                  >
+                    {r.needed > 0 ? `Need ${r.needed} more` : '✓ Quota Met'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Acquired Players Roster Strip */}
+        <div className="space-y-2 pt-2 border-t border-dark-border">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+            Acquired Players In Current Franchise Roster:
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {myTeam.roster.map((player, idx) => (
+              <span
+                key={idx}
+                className="px-3 py-1.5 rounded-xl bg-dark-surface border border-dark-border text-xs text-slate-200 flex items-center gap-2"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald" />
+                <span className="font-semibold text-slate-100">{player.name}</span>
+                <span className="text-[10px] text-slate-400">({player.role})</span>
+                <span className="text-[10px] font-mono text-brand-gold font-bold">
+                  {formatCurrency(player.acquiredPrice || 10000)}
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Lot Result Celebration Modal */}
       {lotResult && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
@@ -870,6 +1152,87 @@ const LiveAuctionRoom = () => {
             >
               <span>Load Next Player Lot</span> &rarr;
             </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Official Tournament Squad Rules & Balance Modal */}
+      {showRulesModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-dark-card border border-brand-emerald/60 rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-dark-border pb-4">
+              <div>
+                <span className="text-[10px] text-brand-emerald font-bold uppercase tracking-wider block">
+                  OFFICIAL TOURNAMENT HANDBOOK
+                </span>
+                <h3 className="font-gaming text-2xl font-bold text-slate-100 uppercase">
+                  {activeGameConfig.gameTitle} Regulations
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowRulesModal(false)}
+                className="p-2 rounded-xl bg-dark-surface border border-dark-border text-slate-400 hover:text-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs text-slate-300">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border">
+                  <span className="text-[10px] text-slate-400 block uppercase">Min Squad</span>
+                  <span className="font-mono text-base font-bold text-slate-100">{activeGameConfig.squadMin} Players</span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border">
+                  <span className="text-[10px] text-slate-400 block uppercase">Max Squad</span>
+                  <span className="font-mono text-base font-bold text-slate-100">{activeGameConfig.squadMax} Players</span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border">
+                  <span className="text-[10px] text-slate-400 block uppercase">Purse Limit</span>
+                  <span className="font-mono text-base font-bold text-brand-emerald">{formatCurrency(activeGameConfig.purseLimit)}</span>
+                </div>
+                <div className="bg-dark-surface p-3 rounded-xl border border-dark-border">
+                  <span className="text-[10px] text-slate-400 block uppercase">Min Base Price</span>
+                  <span className="font-mono text-base font-bold text-brand-gold">{formatCurrency(activeGameConfig.minBasePrice)}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-gaming text-sm font-bold text-slate-100 uppercase">Mandatory Squad Roles</h4>
+                <div className="space-y-1.5">
+                  {activeGameConfig.roles.map((r) => (
+                    <div key={r.id} className="p-3 bg-dark-surface rounded-xl border border-dark-border/70 flex items-start justify-between">
+                      <div>
+                        <p className="font-bold text-slate-100">{r.label} ({r.labelHinglish})</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{r.description}</p>
+                      </div>
+                      <span className="font-mono text-xs font-bold text-brand-emerald bg-brand-emerald/10 px-2 py-1 rounded">
+                        Min {r.min} - Max {r.max}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-gaming text-sm font-bold text-slate-100 uppercase">Official League Rules</h4>
+                <ul className="space-y-1.5">
+                  {activeGameConfig.keyRules.map((rule, idx) => (
+                    <li key={idx} className="flex items-start gap-2 bg-dark-surface/50 p-2.5 rounded-lg border border-dark-border">
+                      <Check className="w-4 h-4 text-brand-emerald shrink-0 mt-0.5" />
+                      <span>{rule}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-dark-border flex justify-end">
+              <Button variant="primary" size="md" onClick={() => setShowRulesModal(false)}>
+                Got It, Return to Auction
+              </Button>
+            </div>
           </div>
         </div>
       )}
