@@ -7,6 +7,7 @@ import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import {
   Shield,
+  ShieldCheck,
   Gamepad2,
   Flame,
   Users,
@@ -81,6 +82,57 @@ const AdminOverview = () => {
       role: 'Grandmaster (Board 1)',
       tier: 'Super GM',
       stat: 'Elo: 2750',
+    },
+  ]);
+
+  const [licensedTournaments, setLicensedTournaments] = useState([
+    {
+      id: 'lic_1',
+      organizer: 'Mumbai Sports Council & Turf Club',
+      tournament: 'Mumbai Premier Box Cricket League 2026',
+      game: 'Cricket',
+      tier: 'Gold Championship Slot',
+      feePaid: 3499,
+      teamsMax: 16,
+      licenseKey: 'LIC-ADMIN-8492-CRIC',
+      status: 'Active & Verified',
+      date: '2026-03-01',
+    },
+    {
+      id: 'lic_2',
+      organizer: 'SkyEsports India',
+      tournament: 'BGMI Champions Cup Season 5',
+      game: 'BGMI',
+      tier: 'Silver Pro Hosting Slot',
+      feePaid: 1999,
+      teamsMax: 16,
+      licenseKey: 'LIC-ADMIN-9102-BGMI',
+      status: 'Active & Verified',
+      date: '2026-03-03',
+    },
+    {
+      id: 'lic_3',
+      organizer: 'All India Carrom Federation (AICF)',
+      tournament: 'All-India Carrom Masters League 2026',
+      game: 'Carrom',
+      tier: 'Bronze Hosting Slot',
+      feePaid: 999,
+      teamsMax: 8,
+      licenseKey: 'LIC-ADMIN-7721-CARROM',
+      status: 'Active & Verified',
+      date: '2026-03-02',
+    },
+    {
+      id: 'lic_4',
+      organizer: 'Delhi Football Association',
+      tournament: 'Delhi National Turf Football Pro League',
+      game: 'Football',
+      tier: 'Gold Championship Slot',
+      feePaid: 3499,
+      teamsMax: 16,
+      licenseKey: 'LIC-ADMIN-6540-FOOT',
+      status: 'Active & Verified',
+      date: '2026-03-04',
     },
   ]);
 
@@ -233,6 +285,19 @@ const AdminOverview = () => {
         >
           <Users className="w-4 h-4" />
           <span>Approvals ({pendingParticipants.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('licenses')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+            activeTab === 'licenses'
+              ? 'bg-brand-emerald text-black shadow-glow-emerald'
+              : 'text-slate-400 hover:text-slate-100'
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4" />
+          <span>Hosting Slots & Licenses ({licensedTournaments.length})</span>
         </button>
       </div>
 
@@ -416,6 +481,84 @@ const AdminOverview = () => {
             {pendingParticipants.length === 0 && (
               <p className="text-xs text-slate-400 py-6 text-center">No pending athlete registrations.</p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Tab 5: Tournament Hosting Slots & Licenses */}
+      {activeTab === 'licenses' && (
+        <div className="space-y-6">
+          <div className="bg-dark-card border border-brand-gold/40 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-glow-gold/10">
+            <div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-6 h-6 text-brand-gold" />
+                <h3 className="font-gaming text-2xl font-bold text-slate-100 uppercase">
+                  Tournament Hosting Licenses & Admin Slot Vault
+                </h3>
+              </div>
+              <p className="text-xs text-slate-400 mt-1">
+                Tournaments organized by third-party organizers who purchased official platform hosting slots from Arena Admin.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="p-4 bg-dark-surface rounded-2xl border border-dark-border text-center min-w-[160px]">
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Admin Slot Revenue</span>
+                <span className="font-gaming font-extrabold text-brand-gold text-2xl block mt-0.5">
+                  {formatCurrency(licensedTournaments.reduce((acc, curr) => acc + curr.feePaid, 0))}
+                </span>
+              </div>
+              <div className="p-4 bg-dark-surface rounded-2xl border border-dark-border text-center min-w-[130px]">
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Active Licenses</span>
+                <span className="font-gaming font-extrabold text-brand-emerald text-2xl block mt-0.5">
+                  {licensedTournaments.length} Verified
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-8 space-y-4">
+            <h4 className="font-gaming text-lg font-bold text-slate-100 uppercase">
+              Issued Organizer Slot Licenses
+            </h4>
+
+            <div className="space-y-3">
+              {licensedTournaments.map((lic) => (
+                <div
+                  key={lic.id}
+                  className="bg-dark-surface border border-dark-border rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-slate-600 transition-all"
+                >
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-bold text-slate-100 text-sm font-gaming">{lic.tournament}</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-brand-emerald/15 text-brand-emerald border border-brand-emerald/30">
+                        {lic.game}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-dark-bg text-brand-gold border border-brand-gold/30">
+                        {lic.licenseKey}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Host: <span className="text-slate-200 font-semibold">{lic.organizer}</span> | Tier: <span className="text-brand-emerald font-semibold">{lic.tier}</span> ({lic.teamsMax} Teams Cap)
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4 shrink-0">
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-400 uppercase block">Admin Slot Fee Paid</span>
+                      <span className="font-gaming font-bold text-brand-gold text-base">
+                        {formatCurrency(lic.feePaid)}
+                      </span>
+                    </div>
+
+                    <div className="px-3.5 py-1.5 rounded-xl bg-brand-emerald/15 border border-brand-emerald/40 text-brand-emerald text-xs font-bold flex items-center gap-1.5">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>{lic.status}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

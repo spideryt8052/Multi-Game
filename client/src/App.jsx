@@ -24,6 +24,7 @@ import VerifyEmail from './pages/auth/VerifyEmail';
 import UserDashboard from './pages/dashboard/UserDashboard';
 import TeamDashboard from './pages/dashboard/TeamDashboard';
 import CreateTeam from './pages/dashboard/CreateTeam';
+import HostTournament from './pages/dashboard/HostTournament';
 
 // Admin Pages
 import AdminOverview from './pages/admin/AdminOverview';
@@ -80,6 +81,9 @@ function App() {
           <Route path="/teams" element={<TeamDashboard />} />
           <Route path="/teams/create" element={<CreateTeam />} />
           <Route path="/create-team" element={<CreateTeam />} />
+          <Route path="/host-tournament" element={<HostTournament />} />
+          <Route path="/tournaments/create" element={<HostTournament />} />
+          <Route path="/organize" element={<HostTournament />} />
 
           {/* Protected Admin Console */}
           <Route path="/admin" element={<AdminOverview />} />

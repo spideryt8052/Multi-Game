@@ -68,6 +68,36 @@ const auctionSchema = new mongoose.Schema(
       type: Number,
       default: 50000,
     },
+    entryFee: {
+      type: Number,
+      default: 2500,
+    },
+    prizePool: {
+      total: { type: Number, default: 50000 },
+      firstPlace: { type: Number, default: 30000 },
+      secondPlace: { type: Number, default: 15000 },
+      thirdPlace: { type: Number, default: 5000 },
+      mvp: { type: Number, default: 2500 },
+    },
+    adminSlot: {
+      tier: { type: String, default: 'Silver Slot (16 Teams)' },
+      feePaid: { type: Number, default: 1999 },
+      licenseNumber: { type: String, default: 'LIC-ADMIN-8492' },
+      isApprovedByAdmin: { type: Boolean, default: true },
+    },
+    matchFormat: {
+      type: String,
+      default: 'Standard Competitive Format',
+    },
+    venueOrServer: {
+      type: String,
+      default: 'Main Tournament Arena',
+    },
+    externalRules: [
+      {
+        type: String,
+      },
+    ],
     currentLot: {
       participant: {
         type: mongoose.Schema.Types.ObjectId,

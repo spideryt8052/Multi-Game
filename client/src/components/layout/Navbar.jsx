@@ -42,6 +42,7 @@ const Navbar = () => {
     },
     { name: t('nav.upcoming'), path: '/auctions/upcoming', icon: Calendar },
     { name: t('nav.rules'), path: '/rules', icon: BookOpen },
+    { name: 'Host Tournament', path: '/host-tournament', icon: Trophy, isHost: true },
   ];
 
   const isActive = (path) => {
@@ -161,6 +162,15 @@ const Navbar = () => {
                     >
                       <Layers className="w-4 h-4 text-slate-400" />
                       <span>{t('nav.team_hub')}</span>
+                    </Link>
+
+                    <Link
+                      to="/host-tournament"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-brand-emerald hover:bg-dark-surface transition-colors"
+                    >
+                      <Trophy className="w-4 h-4 text-brand-emerald" />
+                      <span>Host Tournament</span>
                     </Link>
 
                     {hasRole('admin') && (
