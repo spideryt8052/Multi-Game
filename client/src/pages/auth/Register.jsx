@@ -81,7 +81,17 @@ const Register = () => {
     goalsScored: 12,
     assists: 8,
 
-    // KABADDI / CHESS / CARROM
+    // CARROM ATTRIBUTES
+    carromRole: 'White Slam Specialist',
+    strikingHand: 'right',
+    gripStyle: 'scissor',
+    carromTier: 'state_champion',
+    strikerWeight: '15.0g',
+    whiteSlams: 18,
+    pocketAccuracy: 94.2,
+    aicfRank: 'Top 10 State',
+
+    // KABADDI / CHESS
     raidPoints: 48,
     fideRating: 2150,
 
@@ -152,7 +162,15 @@ const Register = () => {
       subRole: defaultSubRole,
       expectedBasePrice: defaultBasePrice,
       // Adjust inGameId placeholder context
-      inGameId: prev.inGameId || (slug === 'cricket' ? 'Jersey #45' : slug === 'valorant' ? 'Player#IND' : 'UID 51928410'),
+      inGameId:
+        prev.inGameId ||
+        (slug === 'cricket'
+          ? 'Jersey #45'
+          : slug === 'carrom'
+          ? 'AICF-2026-904'
+          : slug === 'valorant'
+          ? 'Player#IND'
+          : 'UID 51928410'),
     }));
   };
 
@@ -192,13 +210,18 @@ const Register = () => {
               battingStyle: formData.battingStyle,
               bowlingStyle: formData.bowlingStyle,
               preferredFoot: formData.preferredFoot,
+              strikingHand: formData.strikingHand,
+              gripStyle: formData.gripStyle,
+              strikerWeight: formData.strikerWeight,
+              aicfRank: formData.aicfRank,
               device: formData.device,
               controlSetup: formData.controlSetup,
               rankTier: formData.rankTier,
               signatureAgents: formData.signatureAgents
                 ? formData.signatureAgents.split(',').map((s) => s.trim())
                 : [],
-              playerCategory: formData.cricketCategory || formData.footballCategory || 'uncapped',
+              playerCategory:
+                formData.cricketCategory || formData.footballCategory || formData.carromTier || 'uncapped',
               jerseyNumber: parseInt(formData.jerseyNumber, 10) || 45,
               expectedBasePrice: parseInt(formData.expectedBasePrice, 10) || 10000,
               accolades: formData.accolades,
@@ -215,6 +238,8 @@ const Register = () => {
                 assists: parseInt(formData.assists, 10) || 0,
                 raidPoints: parseInt(formData.raidPoints, 10) || 0,
                 fideRating: parseInt(formData.fideRating, 10) || 0,
+                whiteSlams: parseInt(formData.whiteSlams, 10) || 0,
+                pocketAccuracy: parseFloat(formData.pocketAccuracy) || 0,
               },
             }
           : undefined;
@@ -481,9 +506,10 @@ const Register = () => {
                   <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider">
                     Choose Your Sport / Game Title:
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
                     {[
                       { slug: 'cricket', name: 'Cricket (IPL)', icon: '🏏' },
+                      { slug: 'carrom', name: 'Carrom Masters', icon: '🎯' },
                       { slug: 'bgmi', name: 'BGMI Mobile', icon: '🎮' },
                       { slug: 'valorant', name: 'Valorant FPS', icon: '⚡' },
                       { slug: 'football', name: 'Football / Turf', icon: '⚽' },
@@ -999,6 +1025,192 @@ const Register = () => {
                   </div>
                 )}
 
+                {/* --- GAME 5: CARROM (NATIONAL & CORPORATE CHAMPIONSHIP) --- */}
+                {formData.selectedSportSlug === 'carrom' && (
+                  <div className="space-y-4 pt-2 border-t border-dark-border/60">
+                    <div className="flex items-center gap-2 text-xs font-bold text-brand-gold uppercase">
+                      <span>🎯 Carrom Masters & White Slam Championship Form</span>
+                      <span className="text-[10px] text-slate-400 font-normal">
+                        (White Slam Specialist, Direct Striker, Cut & Pocket Master, Grip & Striker Weight)
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      {/* Carrom Role */}
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                          Carrom Board Specialization *
+                        </label>
+                        <select
+                          name="primaryRole"
+                          value={formData.primaryRole}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
+                        >
+                          <option value="White Slam Specialist">⚡ White Slam Specialist (1st Break Clearer)</option>
+                          <option value="Direct Striker">🎯 Direct Striker (Seedha Nishanebaaz)</option>
+                          <option value="Cut & Pocket Master">📐 Cut & Pocket Master (Rebound / Double Cut)</option>
+                          <option value="Doubles Partner / Anchor">🛡️ Doubles Partner (Jodi Saathi & Defensive Anchor)</option>
+                        </select>
+                      </div>
+
+                      {/* Striking Arm / Hand Style */}
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                          Striking Hand Style (Righty / Lefty) *
+                        </label>
+                        <select
+                          name="strikingHand"
+                          value={formData.strikingHand}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
+                        >
+                          <option value="right">Right-Hand Striker (Righty)</option>
+                          <option value="left">Left-Hand Striker (Lefty)</option>
+                          <option value="both">Ambidextrous (Both Hands Capable)</option>
+                        </select>
+                      </div>
+
+                      {/* Grip & Release Technique */}
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                          Grip & Release Technique *
+                        </label>
+                        <select
+                          name="gripStyle"
+                          value={formData.gripStyle}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
+                        >
+                          <option value="scissor">Scissor Grip (Middle-Index Finger Release)</option>
+                          <option value="straight_finger">Straight Finger Drive (Index Push)</option>
+                          <option value="thumb_flick">Thumb Flick (Angootha Drive)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                      {/* Federation Registration ID */}
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                          AICF / Board Reg ID *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          name="inGameId"
+                          value={formData.inGameId}
+                          onChange={handleChange}
+                          placeholder="e.g. AICF-2026-904"
+                          className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-brand-emerald"
+                        />
+                      </div>
+
+                      {/* Federation Ranking / Tier */}
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                          Federation Ranking Tier *
+                        </label>
+                        <select
+                          name="carromTier"
+                          value={formData.carromTier}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 focus:outline-none focus:border-brand-emerald"
+                        >
+                          <option value="state_champion">State Championship Medalist</option>
+                          <option value="aicf_national">AICF National Ranked Master</option>
+                          <option value="district_club">District / Corporate Club Ace</option>
+                        </select>
+                      </div>
+
+                      {/* Striker Weight */}
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                          Match Striker Weight *
+                        </label>
+                        <select
+                          name="strikerWeight"
+                          value={formData.strikerWeight}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-brand-emerald"
+                        >
+                          <option value="15.0g">15.0g (Standard Match Legal)</option>
+                          <option value="14.8g">14.8g (Precision Speed)</option>
+                          <option value="15.2g">15.2g (Heavy Impact)</option>
+                        </select>
+                      </div>
+
+                      {/* Base Price Slabs */}
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                          Auction Base Price Floor *
+                        </label>
+                        <select
+                          name="expectedBasePrice"
+                          value={formData.expectedBasePrice}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-xs text-brand-emerald font-mono font-bold focus:outline-none focus:border-brand-emerald"
+                        >
+                          <option value="3000">₹3,000 (Club / District Prodigy)</option>
+                          <option value="6000">₹6,000 (State Ranked Regular)</option>
+                          <option value="12000">₹12,000 (National Champion Contender)</option>
+                          <option value="25000">₹25,000 (White Slam Legend / Marquee Icon)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Verified Carrom Career Statistics */}
+                    <div className="bg-dark-card/60 p-4 rounded-2xl border border-dark-border space-y-3">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 block">
+                        Verified Carrom Championship Statistics (Scouted by Franchises)
+                      </span>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div>
+                          <label className="block text-[10px] text-slate-400">Total Career Matches</label>
+                          <input
+                            type="number"
+                            name="matchesPlayed"
+                            value={formData.matchesPlayed}
+                            onChange={handleChange}
+                            className="w-full px-2.5 py-1.5 bg-dark-surface border border-dark-border rounded-lg text-xs text-slate-100 font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-400">White Slams (1st Turn Clearances)</label>
+                          <input
+                            type="number"
+                            name="whiteSlams"
+                            value={formData.whiteSlams}
+                            onChange={handleChange}
+                            className="w-full px-2.5 py-1.5 bg-dark-surface border border-dark-border rounded-lg text-xs text-brand-emerald font-mono font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-400">Pocket Accuracy %</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            name="pocketAccuracy"
+                            value={formData.pocketAccuracy}
+                            onChange={handleChange}
+                            className="w-full px-2.5 py-1.5 bg-dark-surface border border-dark-border rounded-lg text-xs text-brand-gold font-mono font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-400">AICF / State Rank</label>
+                          <input
+                            type="text"
+                            name="aicfRank"
+                            value={formData.aicfRank}
+                            onChange={handleChange}
+                            className="w-full px-2.5 py-1.5 bg-dark-surface border border-dark-border rounded-lg text-xs text-slate-100 font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Accolades & Trophies */}
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-300 mb-1">
@@ -1029,7 +1241,19 @@ const Register = () => {
                   <div className="bg-dark-surface p-4 rounded-xl border border-dark-border/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <div className="w-14 h-14 rounded-xl bg-dark-card border border-brand-cyan/40 text-brand-cyan flex items-center justify-center font-bold text-2xl">
-                        {formData.selectedSportSlug === 'cricket' ? '🏏' : formData.selectedSportSlug === 'football' ? '⚽' : '🎮'}
+                        {formData.selectedSportSlug === 'cricket'
+                          ? '🏏'
+                          : formData.selectedSportSlug === 'carrom'
+                          ? '🎯'
+                          : formData.selectedSportSlug === 'football'
+                          ? '⚽'
+                          : formData.selectedSportSlug === 'kabaddi'
+                          ? '🤼'
+                          : formData.selectedSportSlug === 'chess'
+                          ? '♟️'
+                          : formData.selectedSportSlug === 'valorant'
+                          ? '⚡'
+                          : '🎮'}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -1049,6 +1273,14 @@ const Register = () => {
                               {' '}
                               • {formData.battingStyle === 'rhb' ? 'Right-Hand Bat (RHB)' : 'Left-Hand Bat (LHB)'} •{' '}
                               {formData.bowlingStyle.toUpperCase()}
+                            </span>
+                          )}
+                          {formData.selectedSportSlug === 'carrom' && (
+                            <span className="text-slate-400">
+                              {' '}
+                              • {formData.strikingHand === 'left' ? 'Lefty' : 'Righty'} Striker •{' '}
+                              {formData.gripStyle} grip • White Slams: {formData.whiteSlams} • Accuracy:{' '}
+                              {formData.pocketAccuracy}%
                             </span>
                           )}
                           {formData.selectedSportSlug === 'bgmi' && (

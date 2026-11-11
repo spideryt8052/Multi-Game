@@ -417,6 +417,83 @@ export const SQUAD_RULES_CONFIG = {
       'FIDE Classical & Rapid ratings verified before registration.',
     ],
   },
+
+  carrom: {
+    gameSlug: 'carrom',
+    gameTitle: 'Carrom (National & Corporate Championship)',
+    categoryType: 'physical_sports',
+    icon: '🎯',
+    governingBody: 'All India Carrom Federation (AICF)',
+    squadMin: 4,
+    squadMax: 5,
+    purseLimit: 50000,
+    minBasePrice: 3000,
+    roles: [
+      {
+        id: 'white_slam',
+        label: 'White Slam Specialist',
+        labelHinglish: 'White Slam Master (1st Break Clearer)',
+        min: 1,
+        max: 2,
+        description: 'Elite master capable of pocketing all 9 white carrom men in a single unbroken turn',
+        subRoles: ['First-Break Striker', 'Rapid Board Finisher'],
+      },
+      {
+        id: 'direct_striker',
+        label: 'Direct Striker',
+        labelHinglish: 'Direct Striker (Seedha Nishanebaaz)',
+        min: 1,
+        max: 2,
+        description: 'Power hitting and baseline dominance, flawless straight pocket accuracy',
+        subRoles: ['Power Striker', 'Center-Board Dominator'],
+      },
+      {
+        id: 'cut_pocket',
+        label: 'Cut & Pocket Master',
+        labelHinglish: 'Cut & Pocket Master (Rebound / Cut Specialist)',
+        min: 1,
+        max: 2,
+        description: 'Precision angle player specialized in fine cuts, frame rebounds, and double-pocket shots',
+        subRoles: ['Fine Cut Specialist', 'Frame Rebound Expert'],
+      },
+      {
+        id: 'doubles_partner',
+        label: 'Doubles Partner / Anchor',
+        labelHinglish: 'Doubles Partner (Jodi Saathi & Defensive Anchor)',
+        min: 1,
+        max: 2,
+        description: 'Tactical coordinator who leaves strategic covers and sets up coins for partner',
+        subRoles: ['Setup Specialist', 'Cover & Block Master'],
+      },
+    ],
+    strikingHands: [
+      { id: 'right', label: 'Right-Hand Striker (Righty)' },
+      { id: 'left', label: 'Left-Hand Striker (Lefty)' },
+      { id: 'both', label: 'Ambidextrous (Both Hands)' },
+    ],
+    gripStyles: [
+      { id: 'scissor', label: 'Scissor Grip (Middle-Index Finger Release)' },
+      { id: 'straight_finger', label: 'Straight Finger Drive (Index Push)' },
+      { id: 'thumb_flick', label: 'Thumb Flick (Angootha Strike)' },
+    ],
+    federationTiers: [
+      { id: 'aicf_national', label: 'AICF National Ranked Master' },
+      { id: 'state_champion', label: 'State Championship Medalist' },
+      { id: 'district_club', label: 'District / Corporate Club Ace' },
+    ],
+    basePriceSlabs: [
+      { value: 3000, label: '₹3,000 (Club / District Prodigy)' },
+      { value: 6000, label: '₹6,000 (State Ranked Regular)' },
+      { value: 12000, label: '₹12,000 (National Champion Contender)' },
+      { value: 25000, label: '₹25,000 (White Slam Legend / Marquee Icon)' },
+    ],
+    keyRules: [
+      'Official squad requires 4 board players + 1 substitute (max 5 players).',
+      'At least 1 verified White Slam specialist required for franchise qualification.',
+      'Must have at least 1 Cut & Pocket Master and 1 Direct Striker.',
+      'Tournament-certified standard 15g match striker must be verified by referee.',
+    ],
+  },
 };
 
 /**
@@ -473,6 +550,18 @@ export function evaluateSquadCompliance(roster = [], gameSlug = 'cricket') {
       }
       if (rId === 'sentinel') {
         return pRole.includes('sentinel') || pRole.includes('anchor');
+      }
+      if (rId === 'white_slam') {
+        return pRole.includes('white') || pRole.includes('slam');
+      }
+      if (rId === 'direct_striker') {
+        return pRole.includes('direct') || pRole.includes('striker');
+      }
+      if (rId === 'cut_pocket') {
+        return pRole.includes('cut') || pRole.includes('pocket') || pRole.includes('rebound');
+      }
+      if (rId === 'doubles_partner') {
+        return pRole.includes('doubles') || pRole.includes('partner') || pRole.includes('anchor');
       }
       return pRole.includes(rId) || pRole.includes(rLabel);
     });
@@ -607,3 +696,4 @@ export function validatePurseAndSquadLimits(team, lot, bidAmount, gameSlug = 'cr
     safeMaxBid: Math.max(0, team.remainingBudget - mandatoryReserveRequired),
   };
 }
+
