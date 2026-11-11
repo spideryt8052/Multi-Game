@@ -27,4 +27,6 @@ pnpm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+.vercel/
+client/.vercel/
 
